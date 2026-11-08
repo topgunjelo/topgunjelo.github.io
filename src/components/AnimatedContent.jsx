@@ -47,6 +47,7 @@ const AnimatedContent = ({
   onComplete,
   onDisappearanceComplete,
   className = '',
+  as: Tag = 'div',
   style,
   ...props
 }) => {
@@ -206,9 +207,9 @@ const AnimatedContent = ({
   ]);
 
   return (
-    <div ref={ref} className={className} style={{ visibility: 'hidden', ...style }} {...props}>
+    <Tag ref={ref} className={className} style={{ visibility: 'hidden', ...style }} {...props}>
       {children}
-    </div>
+    </Tag>
   );
 };
 

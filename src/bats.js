@@ -2,6 +2,7 @@ const sectionSelector = '[data-bat-section]';
 const desktopCount = 34;
 const mobileCount = 17;
 const tau = 2 * Math.PI;
+const chapterInk = ['#260b14', '#330e19', '#42121f', '#521622', '#611b2a'];
 
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 const mix = (a, b, amount) => a + (b - a) * amount;
@@ -56,7 +57,7 @@ function wing(context, side, beat) {
   context.closePath();
 }
 
-function silhouette(context, x, y, radius, angle, beat, bank, opacity, rim, ink = '#080507') {
+function silhouette(context, x, y, radius, angle, beat, bank, opacity, rim, ink = '#080507', edgeInk = '#9e3947') {
   context.save();
   context.translate(x, y);
   context.rotate(angle);
@@ -69,8 +70,8 @@ function silhouette(context, x, y, radius, angle, beat, bank, opacity, rim, ink 
   context.fill();
   if (rim > 0) {
     context.globalAlpha = opacity * rim;
-    context.strokeStyle = '#9e3947';
-    context.lineWidth = Math.min(0.08, 0.62 / radius);
+    context.strokeStyle = edgeInk;
+    context.lineWidth = Math.min(0.16, 0.93 / radius);
     context.stroke();
   }
 
@@ -91,21 +92,60 @@ function silhouette(context, x, y, radius, angle, beat, bank, opacity, rim, ink 
 function openingMembers(count, seed) {
   const next = randomSource(seed);
   return Array.from({ length: count }, (_, index) => ({
-    stream: index % 5,
+    slot: (index * 43) % count,
     side: index % 2 ? -1 : 1,
     order: next(),
     depth: next() ** 2.1,
     offset: next() - 0.5,
     phase: next() * tau,
     rhythm: next(),
-    rim: index % 5 === 1 ? 0.73 : 0.33,
+    rim: index % 6 === 1 ? 0.53 : 0.21,
   })).sort((a, b) => a.depth - b.depth);
 }
 
-const wideOpening = openingMembers(92, 512621);
-const compactOpening = openingMembers(51, 512621);
+const wideOpening = openingMembers(116, 512621);
+const compactOpening = openingMembers(64, 512621);
 
-export function createOpeningFlock(canvas) {
+function sampleTitle(title, canvas, width, height) {
+  if (!title) return [];
+  const ratio = Math.min(1, 760 / width, 760 / height);
+  const mask = document.createElement('canvas');
+  mask.width = Math.ceil(width * ratio);
+  mask.height = Math.ceil(height * ratio);
+  const brush = mask.getContext('2d', { willReadFrequently: true });
+  if (!brush) return [];
+  brush.scale(ratio, ratio);
+  brush.fillStyle = '#fff';
+  brush.textAlign = 'center';
+  const range = document.createRange();
+  const field = canvas.getBoundingClientRect();
+  const words = title.children.length ? title.children : [title];
+  for (const word of words) {
+    range.selectNodeContents(word);
+    const bounds = range.getBoundingClientRect();
+    const style = getComputedStyle(word);
+    const text = word.textContent.trim();
+    if (!bounds.width || !text) continue;
+    brush.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    if ('letterSpacing' in brush) brush.letterSpacing = style.letterSpacing === 'normal' ? '0px' : style.letterSpacing;
+    const metrics = brush.measureText(text);
+    const rise = metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent;
+    brush.fillText(text, bounds.left - field.left + bounds.width * 0.5,
+      bounds.top - field.top + (bounds.height + rise) * 0.5, bounds.width);
+  }
+
+  const points = [];
+  const pixels = brush.getImageData(0, 0, mask.width, mask.height).data;
+  const stride = Math.max(3, Math.round(Math.min(mask.width, mask.height) / 95));
+  for (let x = stride; x < mask.width; x += stride) {
+    for (let y = stride; y < mask.height; y += stride) {
+      if (pixels[(y * mask.width + x) * 4 + 3] > 178) points.push([x / ratio, y / ratio]);
+    }
+  }
+  return points;
+}
+
+export function createOpeningFlock(canvas, title) {
   const still = () => {};
   if (!canvas) return still;
   canvas.dataset.flockMode = 'static';
@@ -121,12 +161,16 @@ export function createOpeningFlock(canvas) {
   let width = 0;
   let height = 0;
   let ratio = 0;
+  let glyphs = [];
+  let fonts;
+  let sampled = false;
   return function paint(progress, time) {
     const nextWidth = canvas.clientWidth;
     const nextHeight = canvas.clientHeight;
     if (!nextWidth || !nextHeight) return;
     const mobile = nextWidth < 760;
     const nextRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1.2 : 1.55);
+    const nextFonts = document.fonts?.status;
     if (width !== nextWidth || height !== nextHeight || ratio !== nextRatio) {
       width = nextWidth;
       height = nextHeight;
@@ -134,74 +178,62 @@ export function createOpeningFlock(canvas) {
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      sampled = false;
     }
     context.clearRect(0, 0, width, height);
-    const phase = progress < 0.16 ? 'stillness' : progress < 0.45 ? 'sweep'
-      : progress < 0.68 ? 'gather' : progress < 1 ? 'disperse' : 'complete';
+    const phase = progress < 0.08 ? 'stillness' : progress < 0.34 ? 'sweep'
+      : progress < 0.74 ? 'assemble' : progress === 0.74 ? 'formed'
+      : progress < 1 ? 'disperse' : 'complete';
     if (canvas.dataset.flockPhase !== phase) canvas.dataset.flockPhase = phase;
     if (progress <= 0 || progress >= 1) return;
+    if (fonts !== nextFonts || !sampled) {
+      fonts = nextFonts;
+      sampled = true;
+      try {
+        glyphs = sampleTitle(title, canvas, width, height);
+      } catch {
+        glyphs = [];
+      }
+    }
 
     const members = mobile ? compactOpening : wideOpening;
     const radiusScale = clamp(Math.min(width, height) / 650, 0.64, 1.42);
     for (const bat of members) {
-      const { stream, side, order, depth, offset } = bat;
-      const crossing = stream === 4;
-      const upper = stream < 2;
-      const direction = upper ? -1 : 1;
-      const nearCamera = depth > 0.90;
-      const delay = 0.035 + order * 0.18;
-      const arrival = smoothstep(delay, 0.49 + order * 0.10, progress);
-      const exit = smoothstep(0.64 + order * 0.08, 0.99, progress);
-      const remaining = 1 - smoothstep(0.91, 1, progress);
+      const { slot, side, order, depth, offset } = bat;
+      const sample = glyphs[Math.floor((slot + 0.12 + order * 0.76) * glyphs.length / members.length)];
+      const destinationX = sample ? sample[0] / width : 0.12 + slot / members.length * 0.76;
+      const destinationY = sample ? sample[1] / height : 0.45 + offset * 0.14;
+      const upper = slot % 4 < 2 ? -1 : 1;
+      const delay = 0.025 + destinationX * 0.12 + order * 0.10;
+      const arrival = smoothstep(delay, 0.47 + destinationX * 0.21 + order * 0.04, progress);
+      const departure = smoothstep(0.74 + order * 0.056, 0.99, progress);
+      const arch = Math.sin(arrival * Math.PI);
+      const flight = Math.max(1 - arrival, departure);
       const wave = Math.sin(time * 3.4 + bat.phase);
-      const flutter = Math.sin(time * (23 + 10 * bat.rhythm) + bat.phase);
-      let x;
-      let y;
-      let presence;
-      let pitch;
-
-      if (crossing) {
-        // The fast crossing passes make the name reveal feel connected to the flock.
-        const pass = clamp((progress - (0.18 + order * 0.25)) / (0.40 + 0.13 * bat.rhythm), 0, 1);
-        x = 0.5 + side * (0.68 - pass * 1.37);
-        y = 0.43 + offset * 0.33 + (pass - 0.50) * (0.20 + bat.rhythm * 0.16);
-        presence = envelope(pass, 0, 0.13, 0.85, 1);
-        pitch = side * 0.21;
-      } else {
-        // Four streams curl around the top and bottom of the title before splitting.
-        const arc = (0.12 + order * 0.76) * Math.PI + direction * (time * 0.29 + offset * 0.26);
-        const radiusX = (mobile ? 0.39 : 0.43) * (stream % 2 ? 0.76 : 1);
-        const radiusY = (mobile ? 0.27 : 0.25) * (stream % 2 ? 0.74 : 1);
-        const ringX = 0.50 + Math.cos(arc) * radiusX + offset * 0.13;
-        const ringY = 0.45 + Math.abs(Math.sin(arc)) * radiusY * direction + offset * 0.14;
-        const entryX = 0.50 + side * (0.50 + order * 0.23 - depth * 0.12);
-        const entryY = 0.46 + direction * (0.25 + 0.38 * offset) - (stream % 2) * 0.095;
-        x = mix(entryX, ringX, arrival) + direction * exit * (0.41 + order * 0.53);
-        y = mix(entryY, ringY, arrival) + direction * exit * (0.24 + bat.rhythm * 0.30);
-        presence = smoothstep(delay * 0.66, delay + 0.12, progress) * remaining;
-        pitch = direction * (0.10 + 0.22 * exit) + offset * 0.23;
-      }
-
-      y += wave * (0.005 + depth * 0.014);
-      x += Math.sin(time * 1.6 + bat.phase) * depth * 0.014;
-      const nearLetters = (1 - smoothstep(0.105, 0.18, Math.abs(y - 0.45)))
-        * (1 - smoothstep(0.39, 0.48, Math.abs(x - 0.50)));
-      const flyby = nearCamera && !crossing ? 1 + 0.75 * exit : 1;
-      const radius = (3.7 + 30 * depth + (nearCamera ? 12 : 0)) * radiusScale
-        * (0.75 + arrival * 0.25) * flyby * (1 - nearLetters * 0.31);
-      const opacity = presence * (0.53 + depth * 0.43) * (1 - nearLetters * 0.39);
+      const flutter = Math.sin(time * (23 + 10 * bat.rhythm) + bat.phase) * (0.33 + 0.67 * flight);
+      const entryX = 0.50 + side * (0.49 + order * 0.17 - depth * 0.15);
+      const entryY = 0.45 + upper * (0.30 + 0.25 * offset);
+      const x = mix(entryX, destinationX, arrival) + arch * side * (0.08 + depth * 0.07)
+        + departure * (destinationX < 0.50 ? -1 : 1) * (0.30 + order * 0.64);
+      const y = mix(entryY, destinationY, arrival) + arch * upper * (0.065 + order * 0.045)
+        + departure * upper * (0.24 + bat.rhythm * 0.49) + wave * flight * 0.014;
+      const radius = mix(3.8 + depth * 35, 3.8 + depth * 8, arrival)
+        * radiusScale * (1 + 2.3 * departure);
+      const opacity = smoothstep(delay * 0.5, delay + 0.10, progress)
+        * (0.66 + depth * 0.33) * (1 - smoothstep(0.90, 1, progress))
+        * mix(1, 0.62, smoothstep(0.59, 0.74, progress) * (1 - departure));
       const px = x * width;
       const py = y * height;
       if (opacity < 0.017 || px < -radius || px > width + radius
         || py < -radius || py > height + radius) continue;
 
-      const rim = bat.rim * (0.77 + 0.23 * wave) * (1 - nearLetters * 0.24);
-      const bank = wave * 0.30 + offset * 0.18;
-      const rotation = pitch + wave * 0.14;
-      const ink = depth < 0.39 ? '#1a070c' : '#080507';
-      if (!mobile && nearCamera && exit > 0.25 && exit < 0.93) {
-        silhouette(context, px - direction * radius * 0.36, py - direction * radius * 0.19,
-          radius * 0.97, rotation, flutter * 0.86, bank, opacity * 0.22, 0, ink);
+      const rim = bat.rim * (0.68 + 0.27 * wave);
+      const bank = (wave * 0.30 + offset * 0.18) * flight;
+      const rotation = (side * 0.31 + wave * 0.19) * flight + offset * 0.22;
+      const ink = depth < 0.32 ? '#11070b' : '#050405';
+      if (!mobile && depth > 0.89 && departure > 0.20 && departure < 0.90) {
+        silhouette(context, px - side * radius * 0.32, py - upper * radius * 0.20,
+          radius * 0.97, rotation, flutter * 0.86, bank, opacity * 0.19, 0, ink);
       }
       silhouette(context, px, py, radius, rotation, flutter, bank, opacity, rim, ink);
     }
@@ -284,7 +316,6 @@ export function initBats(canvas) {
   let burstAt = -Infinity;
   let burstElement = null;
   let activeReveal = null;
-  let painted = false;
 
   function clearReveal() {
     if (!activeReveal) return;
@@ -337,9 +368,9 @@ export function initBats(canvas) {
     for (let index = 1; index < sections.length; index += 1) {
       const section = sections[index];
       const position = (section.top - scroll) / height;
-      const distance = Math.abs(position - 0.43);
-      if (position > 0.10 && position < 0.84 && distance < nearest) {
-        progress = (0.84 - position) / 0.74;
+      const distance = Math.abs(position - 0.52);
+      if (position > 0.11 && position < 1.04 && distance < nearest) {
+        progress = (1.04 - position) / 0.93;
         nearest = distance;
         reveal = section.reveal;
       }
@@ -355,24 +386,19 @@ export function initBats(canvas) {
       progress = burstProgress;
       reveal = burstElement;
     }
-    const motion = bursting ? 1 : mix(1, 0.38, smoothstep(230, 1080, timestamp - lastInput));
+    const motion = bursting ? 1 : mix(1, 0.43, smoothstep(230, 1080, timestamp - lastInput));
     const disturbance = envelope(progress, 0, 0.17, 0.23, 0.42) * motion;
     const swarm = envelope(progress, 0.09, 0.35, 0.52, 0.81) * motion;
     const disintegrate = envelope(progress, 0.36, 0.56, 0.68, 0.87) * motion;
     const reconstruct = envelope(progress, 0.58, 0.76, 0.86, 1) * motion;
     const heroBottom = Math.max(height * 0.65, sections[0]?.bottom || height);
     const hero = 1 - smoothstep(heroBottom * 0.28, heroBottom * 0.96, scroll);
-    const ambience = Math.max(hero, contact * 0.46);
+    const ambience = Math.max(0.46, hero, contact * 0.68);
     const phase = progress < 0.06 ? 'calm' : progress < 0.25 ? 'disturbance'
       : progress < 0.48 ? 'swarm' : progress < 0.71 ? 'disintegration' : 'reconstruction';
     if (canvas.dataset.batPhase !== phase) canvas.dataset.batPhase = phase;
 
-    if (painted) context.clearRect(0, 0, width, height);
-    painted = Math.max(ambience, disturbance, swarm, disintegrate, reconstruct) > 0.008;
-    if (!painted) {
-      clearReveal();
-      return;
-    }
+    context.clearRect(0, 0, width, height);
 
     const count = mobile ? mobileCount : flock.length;
     const scale = Math.min(width, height) / 700;
@@ -394,17 +420,20 @@ export function initBats(canvas) {
         + (pointer * 0.016 - wind * 0.018) * depth) * height;
       const edge = smoothstep(0.32, 0.49, x / width) * (1 - smoothstep(0.99, 1.09, x / width));
       const shadow = envelope(flight, 0, 0.13, 0.83, 1) * ambience * edge;
-      const opacity = Math.min(0.98, (shadow * 0.78 + join * 0.88) * (0.47 + depth * 0.53));
-      const radius = Math.max(2.3, (3.2 + depth * (mobile ? 15 : 31)) * scale * (1 + swarm * 0.23));
+      const opacity = Math.min(0.98, (shadow * 0.93 + join * 0.86) * (0.56 + depth * 0.44));
+      const radius = Math.max(2.5, (4.3 + depth * (mobile ? 17 : 34)) * scale * (1 + swarm * 0.24));
       if (opacity < 0.014 || x < -radius || x > width + radius) continue;
 
       const beat = Math.sin(time * (19.5 + bat.stride * 11) + bat.phase);
       const bank = Math.sin(turn) * 0.25;
       const angle = 0.13 + bat.skew + Math.sin(turn) * 0.15 + wind * 0.12 * depth;
+      const inkIndex = Math.min(chapterInk.length - 1, Math.floor(depth * 3 + join * 3 + (bat.ember ? 1 : 0)));
+      const ink = chapterInk[inkIndex];
       if (!mobile && swarm > 0.22 && depth > 0.55) {
-        silhouette(context, x + 6 + depth * 8, y + 2, radius, angle, beat - 0.20, bank, opacity * 0.16, 0);
+        silhouette(context, x + 6 + depth * 8, y + 2, radius, angle, beat - 0.20, bank, opacity * 0.16, 0, ink);
       }
-      silhouette(context, x, y, radius, angle, beat, bank, opacity, bat.ember ? 0.78 : 0.20);
+      silhouette(context, x, y, radius, angle, beat, bank, opacity,
+        bat.ember ? 0.83 : 0.43, ink, bat.ember ? '#c96072' : '#ae4658');
     }
 
     if (reveal !== activeReveal) clearReveal();

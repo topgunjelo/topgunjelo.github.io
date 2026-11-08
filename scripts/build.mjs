@@ -43,7 +43,7 @@ async function browserFiles() {
 }
 
 const nav = [
-  ['about', 'About'], ['expertise', 'Expertise'], ['work', 'Work'], ['experience', 'Experience'],
+  ['home', 'Home'], ['about', 'About'], ['work', 'Portfolio'], ['contact', 'Contact'],
 ];
 
 function html(value) {
@@ -70,18 +70,7 @@ function header() {
   const links = nav.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('\n');
 
   return `<header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#home">
-        <span class="brand-mark" aria-hidden="true">MM<span>.</span></span>
-        <span class="brand-name">Markie Mojica</span>
-      </a>
-      <nav class="desktop-nav" aria-label="Main navigation">${links}</nav>
-      <a class="header-contact" href="#contact">Contact <span aria-hidden="true">↗</span></a>
-      <details class="mobile-menu">
-        <summary>Menu</summary>
-        <nav class="mobile-nav" aria-label="Main navigation">${links}<a href="#contact">Contact</a></nav>
-      </details>
-    </div>
+    <nav class="center-nav" data-site-nav aria-label="Main navigation">${links}</nav>
   </header>`;
 }
 
@@ -112,41 +101,39 @@ function projectLinks(project) {
   return `${repository}\n${demo}`;
 }
 
-function projectMedia(project, number) {
-  const screenshot = project.screenshot;
-  const visual = screenshot
-    ? `<img src="assets/${html(screenshot.file)}" alt="${html(screenshot.alt)}" width="1200" height="750" loading="lazy" decoding="async">`
-    : `<div class="project-title-card" aria-hidden="true"><span>${html(project.title)}</span></div>`;
-  return `<figure class="project-frame">
-    <div class="project-visual" data-bat-reveal>
-      ${visual}
-      <div data-react-bits aria-hidden="true"></div>
-    </div>
-    <figcaption><span>${number} / ${html(project.category)}</span><span>${screenshot ? html(screenshot.caption || 'Project preview') : 'Title card'}</span></figcaption>
+function projectMedia({ screenshot }) {
+  if (!screenshot) return '';
+  return `<figure class="folder-preview">
+    <img src="assets/${html(screenshot.file)}" alt="${html(screenshot.alt)}" width="1200" height="750" loading="lazy" decoding="async">
+    <figcaption>${html(screenshot.caption || 'Project preview')}</figcaption>
   </figure>`;
 }
 
-function projectScene(project, index) {
+function projectFolder(project, index) {
   const number = String(index + 1).padStart(2, '0');
   const slug = project.slug;
   const links = projectLinks(project).trim();
-  const notes = project.sections.map(({ heading, body }) => `<div class="project-note" data-motion="panel">
-    <h4>${html(heading)}</h4><p>${html(body)}</p>
+  const notes = project.sections.map(({ heading, body }) => `<div class="project-note">
+    <strong>${html(heading)}</strong><p>${html(body)}</p>
   </div>`).join('\n');
-  return `<article class="project project-scene" id="project-${slug}" data-project-scene data-bat-section="${html(project.title)}" aria-labelledby="title-${slug}">
-    ${projectMedia(project, number)}
-    <div class="project-copy">
-      <div class="project-introduction" data-motion="panel">
-        <p class="project-meta">${number} / ${project.visibility === 'private' ? 'Private collaboration' : html(project.category)}</p>
-        <h3 id="title-${slug}">${html(project.title)}</h3>
-        <p class="project-summary">${html(project.summary)}</p>
-        ${tags(project)}
-        ${links ? `<div class="project-links">${links}</div>` : ''}
-      </div>
-      <div class="project-note" data-motion="panel"><h4>My role</h4><p>${html(project.contribution)}</p></div>
-      ${notes}
+  const category = project.badge || project.category;
+  return `<details class="project-folder" name="project-folders" id="project-${slug}" data-project-folder>
+    <summary class="folder-trigger">
+      <span class="folder-art" aria-hidden="true">
+        <span class="folder-back"></span><span class="folder-sheet"><span>${number}</span></span><span class="folder-front"><span>${number}</span></span>
+        <span data-react-bits aria-hidden="true"></span>
+      </span>
+      <span class="folder-label"><span><span class="folder-name">${html(project.title)}</span><span class="folder-meta">${html(category)}</span></span><span class="folder-toggle" aria-hidden="true">+</span></span>
+    </summary>
+    <div class="folder-body">
+      <p class="project-summary">${html(project.summary)}</p>
+      ${projectMedia(project)}
+      <p class="project-role"><strong>My role</strong> ${html(project.contribution)}</p>
+      ${tags(project)}
+      ${links ? `<div class="project-links">${links}</div>` : ''}
+      ${notes ? `<details class="project-more"><summary>Technical notes</summary>${notes}</details>` : ''}
     </div>
-  </article>`;
+  </details>`;
 }
 
 async function cleanOutput() {
@@ -187,7 +174,7 @@ export async function build() {
     HEADER: header(),
     FOOTER: footer(github),
     EXPERTISE: expertise,
-    PROJECTS: projects.map(projectScene).join('\n'),
+    PROJECTS: projects.map(projectFolder).join('\n'),
     PROFILE: profile,
     GITHUB: external(github),
   })];

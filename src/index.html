@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090809">
-  <meta name="description" content="Markie Mojica is a frontend developer and Computer Science student specializing in Digital Forensics. Explore his work, experience, and technical interests.">
+  <meta name="description" content="Markie Mojica is a frontend developer and Computer Science student specializing in Digital Forensics. Explore his projects, tech stack, and experience.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Markie Mojica — Portfolio">
   <meta property="og:description" content="Frontend development, digital forensics, and selected work by Markie Mojica.">
@@ -19,7 +19,7 @@
       root.dataset.opening = 'pending';
       setTimeout(() => {
         if (root.dataset.opening === 'pending') delete root.dataset.opening;
-      }, 5400);
+      }, 4200);
     }
   </script>
   <link rel="stylesheet" href="styles.css">
@@ -31,7 +31,7 @@
     <div class="opening-grain" aria-hidden="true"></div>
     <p class="opening-title title-name" id="opening-title" tabindex="-1"><span>MARKIE</span> <span>MOJICA</span></p>
     <canvas class="opening-bats" id="opening-bats" aria-hidden="true"></canvas>
-    <button type="button" class="opening-skip" id="skip-opening">Skip intro <span aria-hidden="true">↗</span></button>
+    <button type="button" class="opening-skip" id="skip-opening">Click to continue <span aria-hidden="true">↗</span></button>
   </div>
 
   <div id="portfolio">
@@ -45,68 +45,53 @@
     <canvas id="bats" aria-hidden="true"></canvas>
 
     <main id="main" tabindex="-1">
-      <section id="home" class="hero" data-chapter="00" data-bat-section="Opening" aria-labelledby="hero-title">
-        <div class="hero-frame" aria-hidden="true"></div>
+      <section id="home" class="hero" data-chapter="00" data-bat-section="Home" aria-labelledby="hero-title">
         <div class="container hero-inner">
-          <div class="hero-stack">
-            <h1 class="title-name" id="hero-title" tabindex="-1"><span>Markie</span> <span>Mojica</span></h1>
-            <div class="hero-caption" data-motion="hero">
-              <p>Frontend developer <span aria-hidden="true">/</span> Digital Forensics student</p>
-              <span class="hero-caption-line" aria-hidden="true"></span>
+          <div class="hero-heading" data-motion="hero">
+            <h1 id="hero-title" tabindex="-1"><span>Hi, I’m</span> <strong>Markie Mojica<span>.</span></strong></h1>
+          </div>
+          <section id="about" class="profile-scene" data-chapter="about" data-bat-section="About" aria-labelledby="about-title">
+            <div class="profile-role">
+              <span class="profile-index"><span></span> Philippines</span>
+              <p>Frontend development <span>/</span> Digital forensics</p>
             </div>
-          </div>
-          <div class="hero-edge">
-            <span class="hero-edition">Portfolio <span aria-hidden="true">/</span> Philippines</span>
-            <a href="#about" class="scroll-link">Scroll to continue <span aria-hidden="true">↓</span></a>
-            <span class="hero-edition">Chapter 00</span>
-          </div>
-        </div>
-      </section>
-
-      <section id="about" class="section section--about" data-chapter="01" data-bat-section="About" aria-labelledby="about-title">
-        <div class="container about-scene">
-          <div class="chapter-label"><span>01</span><span>About</span></div>
-          <div class="about-panel" data-motion="panel">
-            <span class="panel-corner panel-corner--first" aria-hidden="true"></span><span class="panel-corner panel-corner--last" aria-hidden="true"></span>
-            <h2 id="about-title" class="chapter-title">From interface<br>to <em>evidence.</em></h2>
-            <p class="about-lede">I’m Markie Angelo S. Mojica, a frontend developer and third-year BS Computer Science student at National University.</p>
-            <p>I specialize in Digital Forensics and study cybersecurity and digital investigation. In frontend work, I focus on responsive layouts and interactions people can navigate easily.</p>
-            <dl class="identity-grid">
-              <div><dt>Primary focus</dt><dd>Frontend Development</dd></div>
-              <div><dt>Specialization</dt><dd>Digital Forensics</dd></div>
-              <div><dt>University</dt><dd>National University</dd></div>
-            </dl>
-          </div>
+            <figure class="portrait-slot">
+              <div class="portrait-plate"><span>Portrait slot</span></div>
+            </figure>
+            <div class="about-copy">
+              <h2 id="about-title">About me</h2>
+              <p>I’m a third-year BS Computer Science student at National University, specializing in Digital Forensics. I build responsive web interfaces and study how digital evidence is collected and analyzed.</p>
+              <a class="text-link" href="#work">Explore my portfolio <span aria-hidden="true">↓</span></a>
+            </div>
+          </section>
         </div>
       </section>
 
       <!-- EXPERTISE -->
 
-      <section id="work" class="section section--work" data-chapter="03" data-bat-section="Selected Work" aria-labelledby="work-title">
+      <section id="work" class="section section--work" data-chapter="02" data-bat-section="Portfolio" aria-labelledby="work-title">
         <div class="container">
-          <div class="chapter-label"><span>03</span><span>Projects</span></div>
           <div class="section-heading work-heading" data-motion>
-            <h2 id="work-title" class="chapter-title">Selected <em>work.</em></h2>
-            <p class="section-intro">Independent and collaborative work across frontend development, interactive maps, and network security.</p>
+            <p class="chapter-label"><span>02</span><span>Portfolio</span></p>
+            <h2 id="work-title" class="chapter-title">Project folders<span>.</span></h2>
+            <p class="section-intro">Open a folder to see the project, my role, and the tools I used.</p>
           </div>
-          <div class="project-story"><!-- PROJECTS --></div>
+          <div class="project-folders" data-beat><!-- PROJECTS --></div>
         </div>
       </section>
 
       <!-- PROFILE -->
 
-      <section id="contact" class="contact section" data-chapter="07" data-bat-section="Contact" aria-labelledby="contact-title">
-        <div class="container contact-inner">
-          <div class="chapter-label"><span>07</span><span>Contact</span></div>
-          <div class="contact-scene" data-motion="panel">
-            <h2 id="contact-title" class="chapter-title">Let’s build<br><em>something.</em></h2>
-            <p class="contact-description">I’m open to internships, freelance projects, and collaborations in software development and cybersecurity.</p>
-            <div class="contact-links">
-              <a class="button button--primary" href="mailto:markiemojica0@gmail.com">Email me <span aria-hidden="true">↗</span></a>
-              <a class="text-link" href="<!-- GITHUB -->">GitHub <span aria-hidden="true">↗</span></a>
-            </div>
-            <p class="contact-address">Markie Angelo S. Mojica <span aria-hidden="true">/</span> Philippines</p>
+      <section id="contact" class="contact section" data-chapter="05" data-bat-section="Contact" aria-labelledby="contact-title">
+        <div class="container contact-inner" data-beat>
+          <p class="chapter-label"><span>05</span><span>Contact</span></p>
+          <h2 id="contact-title" class="chapter-title">Let’s work <em>together.</em></h2>
+          <p class="contact-description">I’m open to internships, freelance projects, and collaborations in frontend development and cybersecurity.</p>
+          <div class="contact-links">
+            <a class="button button--primary" href="mailto:markiemojica0@gmail.com">Email me <span aria-hidden="true">↗</span></a>
+            <a class="text-link" href="<!-- GITHUB -->">GitHub <span aria-hidden="true">↗</span></a>
           </div>
+          <p class="contact-address">Philippines</p>
         </div>
       </section>
     </main>

@@ -1,35 +1,34 @@
 import { bindOpening } from './opening.js';
 import { initPortfolioMotion } from './motion.js';
 
-const navigation = [...document.querySelectorAll('.desktop-nav a, .mobile-nav a')];
-const menu = document.querySelector('.mobile-menu');
-const hero = document.querySelector('.hero');
+const navigation = [...document.querySelectorAll('[data-site-nav] a')];
 const canvas = document.querySelector('#bats');
+const folders = document.querySelector('.project-folders');
 let bats;
 
-if (menu) {
-  menu.addEventListener('click', event => {
-    if (event.target.closest('a')) menu.open = false;
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && menu.open) {
-      menu.open = false;
-      menu.querySelector('summary').focus();
+if (folders) {
+  const openLinkedFolder = () => {
+    const target = document.getElementById(location.hash.slice(1));
+    if (target?.matches('[data-project-folder]')) target.open = true;
+  };
+  openLinkedFolder();
+  addEventListener('hashchange', openLinkedFolder);
+  folders.addEventListener('toggle', event => {
+    const folder = event.target;
+    if (folder.matches('[data-project-folder]') && folder.open) {
+      bats?.burst(folder.querySelector('.folder-art'));
     }
-  });
-  document.addEventListener('pointerdown', event => {
-    if (menu.open && !menu.contains(event.target)) menu.open = false;
-  });
+  }, true);
 }
 
-if (hero) {
+if (navigation.length) {
   const sections = [...new Set(navigation.map(link => link.hash))]
     .map(hash => document.getElementById(hash.slice(1))).filter(Boolean);
   let scrollFrame = 0;
   function updateNavigation() {
     scrollFrame = 0;
     const active = sections.findLast(section => section.getBoundingClientRect().top <= innerHeight * .32);
-    const hash = '#' + (active?.id || 'home');
+    const hash = '#' + (scrollY < 40 ? 'home' : active?.id || 'home');
     for (const link of navigation) {
       if (link.hash === hash) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');

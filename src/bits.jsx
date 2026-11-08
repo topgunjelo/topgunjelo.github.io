@@ -25,6 +25,7 @@ export function initReactBits() {
       roots.set(target, root);
       root.render(
         <AnimatedContent
+          as="span"
           className="react-bits-reveal"
           aria-hidden="true"
           direction="horizontal"

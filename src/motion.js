@@ -27,25 +27,6 @@ function driftSmoke(portfolio, wide) {
     });
 }
 
-function frameProjects(portfolio) {
-  for (const scene of portfolio.querySelectorAll('[data-project-scene]')) {
-    const visual = scene.querySelector(':is([data-project-visual], .project-visual):not([data-motion])');
-    const copy = scene.querySelector(':is([data-project-copy], .project-copy):not([data-motion])');
-    if (!visual && !copy) continue;
-
-    const frame = gsap.timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: { trigger: scene, start: 'top 87%', end: 'top 29%', scrub: 0.55 },
-    });
-    if (visual) {
-      frame.fromTo(visual, { y: 22, scale: 0.966 }, { y: 0, scale: 1, duration: 0.82 }, 0);
-    }
-    if (copy) {
-      frame.fromTo(copy, { x: 17, y: 12 }, { x: 0, y: 0, duration: 0.83 }, 0.17);
-    }
-  }
-}
-
 export function initPortfolioMotion() {
   const portfolio = document.getElementById('portfolio');
   if (!portfolio) return () => {};
@@ -57,7 +38,9 @@ export function initPortfolioMotion() {
   let lenis;
   let reveals;
   let scenes;
+  let sceneEvents;
   let anchorTimer;
+  let refreshFrame;
 
   function tick() {
     lenis?.raf(performance.now());
@@ -71,6 +54,7 @@ export function initPortfolioMotion() {
 
   function start() {
     gsap.registerPlugin(ScrollTrigger);
+    sceneEvents = new AbortController();
     lenis = new Lenis({
       autoRaf: false,
       smoothWheel: true,
@@ -129,6 +113,20 @@ export function initPortfolioMotion() {
         });
       }
 
+      // Chapter bats start at the edge of the viewport. The content follows as the flock crosses the middle.
+      const linkedSection = document.getElementById(location.hash.slice(1));
+      for (const element of portfolio.querySelectorAll('[data-beat], .stack-list, .collection-grid')) {
+        if (element.contains(linkedSection) || element.getBoundingClientRect().top <= innerHeight * 0.77) continue;
+        const reveal = gsap.fromTo(element, { y: 22, opacity: 0.76 }, {
+          y: 0, opacity: 1, ease: 'none',
+          scrollTrigger: { trigger: element, start: 'top 75%', end: 'top 51%', scrub: 0.38 },
+        });
+        element.addEventListener('focusin', () => {
+          reveal.progress(1);
+          reveal.scrollTrigger?.kill(false);
+        }, { once: true, signal: sceneEvents.signal });
+      }
+
       const chapters = portfolio.querySelectorAll('main [data-bat-section][id], main [data-chapter][id]');
       if (chapters[0]) root.dataset.chapter = chapters[0].dataset.chapter || chapters[0].id;
       for (const chapter of chapters) {
@@ -149,13 +147,14 @@ export function initPortfolioMotion() {
     scenes = gsap.matchMedia(portfolio);
     scenes.add({ wide: '(min-width: 960px)', all: 'all' }, ({ conditions }) => {
       driftSmoke(portfolio, conditions.wide);
-      if (conditions.wide) frameProjects(portfolio);
     });
   }
 
   function stop() {
     if (!lenis) return;
     clearTimeout(anchorTimer);
+    cancelAnimationFrame(refreshFrame);
+    sceneEvents?.abort();
     delete root.dataset.anchorScroll;
     gsap.ticker.remove(tick);
     lenis.destroy();
@@ -190,6 +189,14 @@ export function initPortfolioMotion() {
   }, { signal: events.signal });
   window.addEventListener('popstate', cancelInertia, { signal: events.signal });
   window.addEventListener('hashchange', cancelInertia, { signal: events.signal });
+  portfolio.addEventListener('toggle', () => {
+    if (!lenis) return;
+    cancelAnimationFrame(refreshFrame);
+    refreshFrame = requestAnimationFrame(() => {
+      lenis.resize();
+      ScrollTrigger.refresh();
+    });
+  }, { capture: true, signal: events.signal });
   reduced.addEventListener('change', sync, { signal: events.signal });
 
   const observer = new MutationObserver(sync);

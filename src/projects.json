@@ -6,6 +6,7 @@
       "title": "NocTime",
       "category": "Social platform prototype",
       "visibility": "private",
+      "badge": "Private collaboration",
       "summary": "An in-development social platform for discovering nightlife events, connecting with people, and sharing experiences after dark.",
       "technologies": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Express"],
       "contribution": "Repository collaborator on a team project.",
@@ -42,6 +43,51 @@
         {
           "heading": "Deployment and updates",
           "body": "Offer details and artwork are organized by stable IDs, so each package can be updated without editing the catalog components. GitHub Actions builds and deploys the Vite output to GitHub Pages, and the repository carries the custom-domain configuration."
+        },
+        {
+          "heading": "Private development workspace",
+          "body": "I keep a separate private angelsam-travel-tours repository for development. The published source is available in the public repository."
+        }
+      ]
+    },
+    {
+      "slug": "sponge",
+      "title": "Sponge",
+      "category": "Personal assistant prototype",
+      "visibility": "private",
+      "badge": "Private personal project",
+      "summary": "A personal assistant prototype for iPhone and Windows, with a Flutter chat interface and a Python backend.",
+      "technologies": ["Flutter", "Dart", "Python", "FastAPI"],
+      "contribution": "Built the Flutter interface and FastAPI backend in a private repository.",
+      "sections": [
+        {
+          "heading": "Cross-platform application",
+          "body": "The prototype uses Flutter for the mobile and desktop interface. It explores conversations with chat history and streamed responses."
+        },
+        {
+          "heading": "Backend foundation",
+          "body": "A separate Python service built with FastAPI supports the application. The repository documents a local development setup for Windows."
+        }
+      ]
+    },
+    {
+      "slug": "amanda-virtual-graduation",
+      "title": "Amanda Virtual Graduation",
+      "category": "Interactive web experience",
+      "summary": "A responsive graduation tribute that unfolds across eight slides with music, confetti, and controls for moving at the visitor’s pace.",
+      "technologies": ["HTML", "CSS", "JavaScript", "Web Audio API", "GitHub Pages"],
+      "contribution": "Built and published the tribute, then refined the responsive ceremony layout and mobile audio playback.",
+      "repository": "https://github.com/topgunjelo/amanda-virtual-graduation",
+      "demo": "https://topgunjelo.github.io/amanda-virtual-graduation/",
+      "screenshot": { "file": "project-graduation.webp", "alt": "Class of 2026 slide with previous, next, and progress controls" },
+      "sections": [
+        {
+          "heading": "Ceremony and navigation",
+          "body": "JavaScript manages slide state, timed advancement, and the closing confetti. Previous and next buttons, keyboard shortcuts, progress dots, and replay let visitors control the eight-slide ceremony."
+        },
+        {
+          "heading": "Playback on mobile",
+          "body": "The opening tap starts the presentation and enables audio. The site can synthesize a short instrumental with the Web Audio API if the audio file fails, and the ceremony includes a pause control."
         }
       ]
     },
