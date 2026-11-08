@@ -1,0 +1,51 @@
+{
+  "github": "https://github.com/topgunjelo",
+  "projects": [
+    {
+      "slug": "angelsam-travel-tours",
+      "title": "AngelSam Travel & Tours",
+      "category": "Business website",
+      "summary": "A responsive travel website where visitors can filter 25 tour offers, view detailed package posters, and request a quotation.",
+      "technologies": ["React", "JavaScript", "CSS", "Vite", "GitHub Pages"],
+      "contribution": "Redesigned the site, added guest reviews, improved the tour inquiry flow, and configured deployment to GitHub Pages.",
+      "repository": "https://github.com/angelsamtravelandtours/angelsam-travel-tours",
+      "demo": "https://angelsamtravels.com/",
+      "art": "travel",
+      "sections": [
+        {
+          "heading": "Tour discovery",
+          "body": "A data-driven React catalog groups 25 offers by tour category. Each offer has a compact cover image and a full poster that visitors can open in a keyboard-accessible dialog to compare details and rates."
+        },
+        {
+          "heading": "From package to inquiry",
+          "body": "The inquiry action carries the selected tour into the form and moves focus to the first field. The form formats travel dates, group size, and pickup details into a quotation request that visitors can send through WhatsApp or email."
+        },
+        {
+          "heading": "Deployment and updates",
+          "body": "Offer details and artwork are organized by stable IDs, so each package can be updated without editing the catalog components. GitHub Actions builds and deploys the Vite output to GitHub Pages, and the repository carries the custom-domain configuration."
+        }
+      ]
+    },
+    {
+      "slug": "amanda-virtual-graduation",
+      "title": "Amanda Virtual Graduation",
+      "category": "Interactive web experience",
+      "summary": "A responsive graduation tribute that unfolds across eight slides with music, confetti, and controls for moving at the visitor’s pace.",
+      "technologies": ["HTML", "CSS", "JavaScript", "Web Audio API", "GitHub Pages"],
+      "contribution": "Built and published the tribute, then refined the responsive ceremony layout and mobile audio playback.",
+      "repository": "https://github.com/topgunjelo/amanda-virtual-graduation",
+      "demo": "https://topgunjelo.github.io/amanda-virtual-graduation/",
+      "art": "graduation",
+      "sections": [
+        {
+          "heading": "Ceremony and navigation",
+          "body": "JavaScript manages slide state, timed advancement, and the closing confetti. Previous and next buttons, keyboard shortcuts, progress dots, and replay let visitors control the eight-slide ceremony."
+        },
+        {
+          "heading": "Playback on mobile",
+          "body": "The opening tap starts the presentation and enables audio. The site can synthesize a short instrumental with the Web Audio API if the audio file fails, and the ceremony includes a pause control."
+        }
+      ]
+    }
+  ]
+}
