@@ -1,3 +1,5 @@
+import { bindOpening } from './opening.js';
+
 const navigation = [...document.querySelectorAll('.desktop-nav a, .mobile-nav a')];
 const menu = document.querySelector('.mobile-menu');
 const hero = document.querySelector('.hero');
@@ -57,22 +59,34 @@ if (hero) {
 }
 
 if (canvas) {
-  const enableBats = () => import('./bats.js').then(({ initBats }) => {
-    bats = initBats(canvas);
-  }).catch(() => { canvas.dataset.batMode = 'static'; });
-  if ('requestIdleCallback' in window) requestIdleCallback(enableBats, { timeout: 600 });
-  else setTimeout(enableBats, 100);
+  let generation = 0;
+  function startBats() {
+    if (bats || document.documentElement.hasAttribute('data-opening')) return;
+    const load = ++generation;
+    import('./bats.js').then(({ initBats }) => {
+      if (load === generation) bats = initBats(canvas);
+    }).catch(() => { canvas.dataset.batMode = 'static'; });
+  }
+  function stopBats() {
+    generation++;
+    bats?.destroy();
+    bats = undefined;
+  }
+  if (!bindOpening({ onStart: stopBats, onFinish: startBats })) {
+    if ('requestIdleCallback' in window) requestIdleCallback(startBats, { timeout: 600 });
+    else setTimeout(startBats, 100);
+  }
 
-  let opening = false;
-  addEventListener('pageshow', () => { opening = false; });
+  let navigatingCase = false;
+  addEventListener('pageshow', () => { navigatingCase = false; });
   document.addEventListener('click', event => {
     const link = event.target.closest('[data-case-link]');
     if (!link || event.defaultPrevented || event.button !== 0 ||
         event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
         reduced.matches || canvas.dataset.batMode !== 'animated') return;
     event.preventDefault();
-    if (opening) return;
-    opening = true;
+    if (navigatingCase) return;
+    navigatingCase = true;
     const visual = link.closest('.project')?.querySelector('[data-bat-reveal]');
     bats.burst(visual);
     setTimeout(() => location.assign(link.href), 510);

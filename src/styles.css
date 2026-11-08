@@ -231,3 +231,47 @@ h1,h2,h3,p,figure,dl,dd{margin:0}
 }
 
 .contact-scene::after{content:"";position:absolute;inset:0 -6% 0 47%;background:url("assets/flock.svg") center/100% auto no-repeat;opacity:.29;transform:rotate(-7deg);pointer-events:none}
+
+/* The opening sits above the portfolio and is hidden on direct section visits. */
+html[data-opening]{overflow:hidden;overscroll-behavior:none}
+html[data-opening="pending"] #portfolio{visibility:hidden}
+.opening{display:none;position:fixed;inset:0;z-index:30;isolation:isolate;overflow:hidden;place-items:center;background:#070506;color:#e5dadd;opacity:1}
+html[data-opening] .opening{display:grid}
+.opening-smoke,.opening-grain,.opening-bats{position:absolute;inset:0;pointer-events:none}
+.opening-smoke{inset:-12%;background:radial-gradient(ellipse at 49% 45%,#3e0712 0%,transparent 52%),linear-gradient(90deg,#070506b0 9%,#07050619 60%,#07050622),url("assets/smoke.webp") 67% 52%/cover no-repeat;opacity:.19;transform:scale(1.06) translate3d(1%,0,0)}
+.opening::after{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 49% 44%,transparent 26%,#050405c9 83%,#050405 100%);pointer-events:none}
+.opening-grain{z-index:2;opacity:.15;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E") repeat;background-size:180px 180px;mix-blend-mode:soft-light}
+.opening-title{position:relative;z-index:3;margin:0 0 9svh;padding:0 .07em;font:800 clamp(4rem,15.2vw,18rem)/.81 var(--display);letter-spacing:-.018em;white-space:nowrap;text-align:center;color:#d8cacc;text-shadow:0 0 65px #d4132e25;transform:scale(.97);user-select:none}
+.opening-title:focus{outline:none}
+.opening-title span:last-child{color:#d7a4a9}
+.opening-bats{z-index:4;width:100%;height:100%}
+.opening-skip{position:absolute;bottom:max(24px,env(safe-area-inset-bottom));right:max(clamp(19px,4.4vw,68px),env(safe-area-inset-right));z-index:5;min-height:44px;display:flex;align-items:center;gap:14px;padding:0 12px;background:#100a0beb;border:1px solid #5b3b41;color:#e6d7da;font:700 .68rem/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;cursor:pointer}
+.opening-skip:hover{background:#301019;border-color:#db6976;color:#fff}
+.opening-skip span{font-size:.91rem;color:#f68691}
+.opening[data-stage="reveal"] .opening-title,.opening[data-stage="dispersal"] .opening-title{color:#f6eeee;transform:scale(1);text-shadow:0 0 55px #df18313b}
+.opening[data-stage="reveal"] .opening-title span:last-child,.opening[data-stage="dispersal"] .opening-title span:last-child{color:#f5d5d9}
+.opening[data-stage="swarm"] .opening-smoke{opacity:.46}
+.opening[data-stage="reveal"] .opening-smoke{opacity:.61;transform:scale(1.12) translate3d(-1%,1%,0)}
+.opening[data-stage="dispersal"] .opening-smoke{opacity:.51;transform:scale(1.2) translate3d(-1.8%,1.5%,0)}
+.opening-title{transition:color .72s ease,text-shadow .72s ease,transform 1.2s cubic-bezier(.16,.65,.2,1)}
+.opening-title span{transition:color .72s ease}
+.opening-smoke{transition:opacity 1s ease,transform 1.8s cubic-bezier(.2,.62,.3,1)}
+html[data-opening="leaving"] .opening{opacity:0;transition:opacity 560ms cubic-bezier(.48,.12,.32,1)}
+html[data-opening="skipping"] .opening{opacity:0;transition:opacity 145ms ease-out}
+html[data-opening="leaving"] .opening-title{transform:scale(1.045);opacity:.5;transition:transform 620ms ease-out,opacity 400ms ease-out}
+#hero-title:focus{outline:none}
+.footer-controls{display:flex;align-items:center;gap:14px 22px;flex-wrap:wrap}
+.footer-replay{appearance:none;padding:5px 0;background:none;border:0;color:#e3d5d8;font:inherit;cursor:pointer}
+.footer-replay:hover{color:#f87783}
+.footer-replay span{margin-left:4px}
+@media(max-width:630px){
+.opening-title{font-size:clamp(4.8rem,26.6vw,9.7rem);line-height:.77;white-space:normal;margin-bottom:10svh}
+.opening-title span{display:block}
+.opening-title span+span{margin-top:.09em}
+.opening-smoke{background-position:center,center,68% 53%}
+}
+@media(prefers-reduced-motion:reduce){
+  html[data-opening]{overflow:auto}
+  html[data-opening] .opening{display:none}
+  html[data-opening="pending"] #portfolio{visibility:visible}
+}

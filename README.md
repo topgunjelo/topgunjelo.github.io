@@ -21,11 +21,12 @@ The build writes the home page and case-study pages to `dist/`. Publish that dir
 
 ## Update content
 
-- `src/index.html` contains the hero, About, and Contact sections.
+- `src/index.html` contains the opening title, hero, About, and Contact sections.
 - `src/profile.html` contains Expertise, Experience, Education, and Learning.
 - `src/projects.json` stores the public GitHub profile, projects, case studies, technology lists, and verified live links. Edit the dataset and run the build to update the site. Use an HTTPS repository URL and omit `demo` when a live link cannot be verified.
 - `src/styles.css` contains the layout, type, palette, and motion styles.
-- `src/bats.js` draws procedural bats and fragments on a single Canvas 2D layer. Page section boundaries drive the transition phases. A project link can trigger the same effect before navigation. Reduced motion and Canvas fallback retain the static visual composition.
+- `src/opening.js` coordinates the short opening, its title reveal, and the fade into the portfolio. Skip intro and Escape end it early. Replay intro is in the homepage footer. Direct section links and reduced motion bypass the opening.
+- `src/bats.js` draws procedural bats and fragments with Canvas 2D. The opening uses a dedicated flock. The portfolio uses a separate layer for scroll and case-study transitions. Only one animation runs at a time. The static composition remains available when Canvas is unavailable.
 
 ## Artwork and type
 

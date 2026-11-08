@@ -12,10 +12,28 @@
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="preload" href="assets/smoke.webp" as="image" fetchpriority="high">
   <link rel="preload" href="assets/barlow-800.woff2" as="font" type="font/woff2" crossorigin>
+  <script>
+    if (!location.hash && !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+        performance.getEntriesByType('navigation')[0]?.type !== 'back_forward') {
+      const root = document.documentElement;
+      root.dataset.opening = 'pending';
+      setTimeout(() => {
+        if (root.dataset.opening === 'pending') delete root.dataset.opening;
+      }, 5400);
+    }
+  </script>
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="main.js"></script>
 </head>
 <body id="top">
+  <div id="opening" class="opening" role="dialog" aria-modal="true" aria-labelledby="opening-title" data-stage="calm">
+    <div class="opening-smoke" aria-hidden="true"></div>
+    <div class="opening-grain" aria-hidden="true"></div>
+    <p class="opening-title" id="opening-title" tabindex="-1"><span>MARKIE</span> <span>MOJICA</span></p>
+    <canvas class="opening-bats" id="opening-bats" aria-hidden="true"></canvas>
+    <button type="button" class="opening-skip" id="skip-opening">Skip intro <span aria-hidden="true">↗</span></button>
+  </div>
+  <div id="portfolio">
   <a class="skip-link" href="#main">Skip to content</a>
   <!-- HEADER -->
   <canvas id="bats" aria-hidden="true"></canvas>
@@ -27,8 +45,8 @@
         <div class="hero-copy">
           <p class="section-kicker"><span>01</span><span class="kicker-line"></span> Personal Portfolio</p>
           <p class="hero-name">Markie Angelo S. Mojica</p>
-          <h1 id="hero-title">I Build Interfaces<br><em>in the Dark.</em><span>I Explore Digital Frontiers.</span></h1>
-          <p class="hero-description">Frontend-focused developer and BS Computer Science student specializing in Digital Forensics, with interests in cybersecurity, ethical hacking, and digital investigation.</p>
+          <h1 id="hero-title" tabindex="-1">Frontend <em>Developer.</em></h1>
+          <p class="hero-description">I’m a BS Computer Science student specializing in Digital Forensics, with interests in cybersecurity and digital investigation.</p>
           <div class="hero-actions">
             <a class="button button--primary" href="#work">Explore My Work <span aria-hidden="true">↗</span></a>
             <a class="button button--outline" href="#about">About Me <span aria-hidden="true">↗</span></a>
@@ -104,6 +122,7 @@
     </section>
   </main>
   <!-- FOOTER -->
+  </div>
 </body>
 </html>
 

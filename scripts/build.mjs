@@ -7,7 +7,7 @@ const src = join(root, 'src');
 export const dist = join(root, 'dist');
 
 const assets = [
-  'styles.css', 'main.js', 'bats.js',
+  'styles.css', 'main.js', 'opening.js', 'bats.js',
   'assets/barlow-800.woff2', 'assets/barlow-LICENSE.txt',
   'assets/manrope.woff2', 'assets/manrope-LICENSE.txt',
   'assets/smoke.webp', 'assets/mark.svg', 'assets/flock.svg',
@@ -57,12 +57,15 @@ function header(prefix) {
   </header>`;
 }
 
-function footer(github) {
+function footer(github, replay = false) {
   return `<footer class="site-footer">
     <div class="container footer-inner">
       <p>© ${new Date().getUTCFullYear()} Markie Angelo S. Mojica</p>
-      <a href="${external(github)}">GitHub <span aria-hidden="true">↗</span></a>
-      <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      <div class="footer-controls">
+        ${replay ? '<button class="footer-replay" id="replay-opening" type="button" hidden>Replay intro <span aria-hidden="true">↺</span></button>' : ''}
+        <a href="${external(github)}">GitHub <span aria-hidden="true">↗</span></a>
+        <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
     </div>
   </footer>`;
 }
@@ -158,7 +161,7 @@ export async function build() {
 
   const pages = [['index.html', fill(index, {
     HEADER: header(''),
-    FOOTER: footer(github),
+    FOOTER: footer(github, true),
     PROJECTS: projects.map(projectCard).join('\n'),
     PROFILE: profile,
     GITHUB: external(github),
