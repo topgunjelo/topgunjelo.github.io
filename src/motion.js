@@ -2,6 +2,50 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 
+function driftSmoke(portfolio, wide) {
+  const smoke = document.querySelector('#atmosphere .atmosphere-smoke');
+  const story = portfolio.querySelector('main');
+  if (!smoke || !story) return;
+
+  const opacity = Number(getComputedStyle(smoke).opacity);
+  const range = wide ? 1 : 0.45;
+  gsap.timeline({
+    defaults: { ease: 'sine.inOut' },
+    scrollTrigger: { trigger: story, start: 'top top', end: 'bottom bottom', scrub: wide ? 1.05 : 0.5 },
+  })
+    .to(smoke, {
+      xPercent: -3 * range, yPercent: -2 * range, scale: 1.07,
+      opacity: opacity * 0.92, duration: 0.26,
+    })
+    .to(smoke, {
+      xPercent: 3.5 * range, yPercent: 2 * range, scale: 1.13,
+      opacity: opacity * 0.68, duration: 0.39,
+    })
+    .to(smoke, {
+      xPercent: -4 * range, yPercent: -3 * range, scale: 1.19,
+      opacity: Math.min(1, opacity * 1.18), duration: 0.35,
+    });
+}
+
+function frameProjects(portfolio) {
+  for (const scene of portfolio.querySelectorAll('[data-project-scene]')) {
+    const visual = scene.querySelector(':is([data-project-visual], .project-visual):not([data-motion])');
+    const copy = scene.querySelector(':is([data-project-copy], .project-copy):not([data-motion])');
+    if (!visual && !copy) continue;
+
+    const frame = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: { trigger: scene, start: 'top 87%', end: 'top 29%', scrub: 0.55 },
+    });
+    if (visual) {
+      frame.fromTo(visual, { y: 22, scale: 0.966 }, { y: 0, scale: 1, duration: 0.82 }, 0);
+    }
+    if (copy) {
+      frame.fromTo(copy, { x: 17, y: 12 }, { x: 0, y: 0, duration: 0.83 }, 0.17);
+    }
+  }
+}
+
 export function initPortfolioMotion() {
   const portfolio = document.getElementById('portfolio');
   if (!portfolio) return () => {};
@@ -12,6 +56,8 @@ export function initPortfolioMotion() {
   const events = new AbortController();
   let lenis;
   let reveals;
+  let scenes;
+  let anchorTimer;
 
   function tick() {
     lenis?.raf(performance.now());
@@ -37,42 +83,89 @@ export function initPortfolioMotion() {
     root.dataset.scrollEngine = 'lenis';
 
     reveals = gsap.context(context => {
-      context.add('reveal', element => {
+      context.add('reveal', (element, delay) => {
         if (seen.has(element)) return;
         seen.add(element);
-        gsap.fromTo(element, { y: 15, opacity: 0.76 }, {
+        if (element.contains(document.activeElement)) return;
+
+        const tier = element.dataset.motion;
+        const panel = tier === 'panel';
+        const hero = tier === 'hero';
+        const opacity = Number(getComputedStyle(element).opacity);
+        gsap.fromTo(element, { y: panel ? 25 : hero ? 20 : 14, opacity: opacity * (panel ? 0.73 : 0.81) }, {
           y: 0,
-          opacity: 1,
-          duration: 0.62,
+          opacity,
+          delay,
+          duration: hero ? 0.92 : panel ? 0.74 : 0.60,
           ease: 'power3.out',
           clearProps: 'transform,opacity',
         });
       });
 
+      const panelGroups = new WeakMap();
       for (const element of portfolio.querySelectorAll('[data-motion]')) {
-        if (element.getBoundingClientRect().top <= window.innerHeight * 0.9) {
+        const tier = element.dataset.motion;
+        let delay = 0;
+        if (tier === 'panel') {
+          const index = panelGroups.get(element.parentElement) || 0;
+          panelGroups.set(element.parentElement, index + 1);
+          delay = (index % 3) * 0.06;
+        }
+        if (tier === 'hero' && !location.hash && window.scrollY < 12) {
+          context.reveal(element, delay);
+          continue;
+        }
+        const threshold = tier === 'panel' ? 0.86 : 0.92;
+        if (element.getBoundingClientRect().top <= window.innerHeight * threshold) {
           seen.add(element);
         }
         if (seen.has(element)) continue;
         ScrollTrigger.create({
           trigger: element,
-          start: 'top 90%',
+          start: tier === 'panel' ? 'top 86%' : 'top 92%',
           end: 'top 78%',
           once: true,
-          onEnter: () => context.reveal(element),
+          onEnter: () => context.reveal(element, delay),
+        });
+      }
+
+      const chapters = portfolio.querySelectorAll('main [data-bat-section][id], main [data-chapter][id]');
+      if (chapters[0]) root.dataset.chapter = chapters[0].dataset.chapter || chapters[0].id;
+      for (const chapter of chapters) {
+        const label = chapter.dataset.chapter || chapter.id;
+        const announce = trigger => {
+          if (trigger.isActive) root.dataset.chapter = label;
+        };
+        ScrollTrigger.create({
+          trigger: chapter,
+          start: 'top 54%',
+          end: 'bottom 54%',
+          onToggle: announce,
+          onRefresh: announce,
         });
       }
     }, portfolio);
+
+    scenes = gsap.matchMedia(portfolio);
+    scenes.add({ wide: '(min-width: 960px)', all: 'all' }, ({ conditions }) => {
+      driftSmoke(portfolio, conditions.wide);
+      if (conditions.wide) frameProjects(portfolio);
+    });
   }
 
   function stop() {
     if (!lenis) return;
+    clearTimeout(anchorTimer);
+    delete root.dataset.anchorScroll;
     gsap.ticker.remove(tick);
     lenis.destroy();
     lenis = undefined;
+    scenes?.revert();
+    scenes = undefined;
     reveals?.revert();
     reveals = undefined;
     delete root.dataset.scrollEngine;
+    delete root.dataset.chapter;
   }
 
   function sync() {
@@ -86,8 +179,14 @@ export function initPortfolioMotion() {
         event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = event.target.closest?.('a[href]');
     if (!link?.hash || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
-    if (link.origin === location.origin && link.pathname === location.pathname &&
-        link.search === location.search) cancelInertia();
+    if (link.origin !== location.origin || link.pathname !== location.pathname ||
+        link.search !== location.search) return;
+    cancelInertia();
+    if (link.classList.contains('skip-link')) return;
+    // Only intentional navigation should animate. A direct URL fragment must settle before ScrollTrigger measures.
+    root.dataset.anchorScroll = '';
+    clearTimeout(anchorTimer);
+    anchorTimer = setTimeout(() => { delete root.dataset.anchorScroll; }, 1200);
   }, { signal: events.signal });
   window.addEventListener('popstate', cancelInertia, { signal: events.signal });
   window.addEventListener('hashchange', cancelInertia, { signal: events.signal });

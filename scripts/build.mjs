@@ -9,7 +9,8 @@ export const dist = join(root, 'dist');
 
 const assets = [
   'assets/manrope.woff2', 'assets/manrope-LICENSE.txt',
-  'assets/smoke.webp', 'assets/mark.svg',
+  'assets/barlow-800.woff2', 'assets/barlow-LICENSE.txt',
+  'assets/ink-smoke.webp', 'assets/mark.svg',
 ];
 
 const licenses = [
@@ -42,7 +43,7 @@ async function browserFiles() {
 }
 
 const nav = [
-  ['work', 'Work'], ['about', 'About'], ['expertise', 'Expertise'], ['experience', 'Experience'],
+  ['about', 'About'], ['expertise', 'Expertise'], ['work', 'Work'], ['experience', 'Experience'],
 ];
 
 function html(value) {
@@ -65,31 +66,31 @@ function fill(template, values) {
   ));
 }
 
-function header(prefix) {
-  const links = nav.map(([id, label]) => `<a href="${prefix}#${id}">${label}</a>`).join('\n');
+function header() {
+  const links = nav.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('\n');
 
   return `<header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="${prefix}#home">
+      <a class="brand" href="#home">
         <span class="brand-mark" aria-hidden="true">MM<span>.</span></span>
         <span class="brand-name">Markie Mojica</span>
       </a>
       <nav class="desktop-nav" aria-label="Main navigation">${links}</nav>
-      <a class="header-contact" href="${prefix}#contact">Contact <span aria-hidden="true">↗</span></a>
+      <a class="header-contact" href="#contact">Contact <span aria-hidden="true">↗</span></a>
       <details class="mobile-menu">
         <summary>Menu</summary>
-        <nav class="mobile-nav" aria-label="Main navigation">${links}<a href="${prefix}#contact">Contact</a></nav>
+        <nav class="mobile-nav" aria-label="Main navigation">${links}<a href="#contact">Contact</a></nav>
       </details>
     </div>
   </header>`;
 }
 
-function footer(github, replay = false) {
+function footer(github) {
   return `<footer class="site-footer">
     <div class="container footer-inner">
       <p>© ${new Date().getUTCFullYear()} Markie Angelo S. Mojica</p>
       <div class="footer-controls">
-        ${replay ? '<button class="footer-replay" id="replay-opening" type="button" hidden>Replay intro <span aria-hidden="true">↺</span></button>' : ''}
+        <button class="footer-replay" id="replay-opening" type="button" hidden>Replay intro <span aria-hidden="true">↺</span></button>
         <a href="${external(github)}">GitHub <span aria-hidden="true">↗</span></a>
         <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
       </div>
@@ -102,71 +103,50 @@ function tags(project) {
 }
 
 function projectLinks(project) {
-  const repository = `<a class="text-link" href="${external(project.repository)}">Repository <span aria-hidden="true">↗</span></a>`;
+  const repository = project.repository
+    ? `<a class="text-link" href="${external(project.repository)}">Repository <span aria-hidden="true">↗</span></a>`
+    : '';
   const demo = project.demo
     ? `<a class="text-link" href="${external(project.demo)}">Live site <span aria-hidden="true">↗</span></a>`
     : '';
   return `${repository}\n${demo}`;
 }
 
-function projectMedia(project, prefix = '', decorate = false) {
-  if (!project.screenshot) return '';
-  const { file, alt } = project.screenshot;
-  return `<figure class="project-visual" ${decorate ? 'data-bat-reveal' : ''}>
-    <img src="${prefix}assets/${html(file)}" alt="${html(alt)}" width="1200" height="750" loading="${decorate ? 'lazy' : 'eager'}" decoding="async">
-    ${decorate ? '<div data-react-bits aria-hidden="true"></div>' : ''}
+function projectMedia(project, number) {
+  const screenshot = project.screenshot;
+  const visual = screenshot
+    ? `<img src="assets/${html(screenshot.file)}" alt="${html(screenshot.alt)}" width="1200" height="750" loading="lazy" decoding="async">`
+    : `<div class="project-title-card" aria-hidden="true"><span>${html(project.title)}</span></div>`;
+  return `<figure class="project-frame">
+    <div class="project-visual" data-bat-reveal>
+      ${visual}
+      <div data-react-bits aria-hidden="true"></div>
+    </div>
+    <figcaption><span>${number} / ${html(project.category)}</span><span>${screenshot ? html(screenshot.caption || 'Project preview') : 'Title card'}</span></figcaption>
   </figure>`;
 }
 
-function projectCard(project, index) {
+function projectScene(project, index) {
   const number = String(index + 1).padStart(2, '0');
   const slug = project.slug;
-  return `<article class="project" aria-labelledby="project-${slug}">
-    <div class="project-meta"><span>${number} / ${html(project.category)}</span><span>Live project</span></div>
-    ${projectMedia(project, '', true)}
+  const links = projectLinks(project).trim();
+  const notes = project.sections.map(({ heading, body }) => `<div class="project-note" data-motion="panel">
+    <h4>${html(heading)}</h4><p>${html(body)}</p>
+  </div>`).join('\n');
+  return `<article class="project project-scene" id="project-${slug}" data-project-scene data-bat-section="${html(project.title)}" aria-labelledby="title-${slug}">
+    ${projectMedia(project, number)}
     <div class="project-copy">
-      <h3 id="project-${slug}">${html(project.title)}</h3>
-      <p>${html(project.summary)}</p>
-      ${tags(project)}
-      <div class="project-links">
-        <a class="button button--outline" href="cases/${slug}/" data-case-link aria-label="Read the ${html(project.title)} case study">Case study <span aria-hidden="true">↗</span></a>
-        ${projectLinks(project)}
+      <div class="project-introduction" data-motion="panel">
+        <p class="project-meta">${number} / ${project.visibility === 'private' ? 'Private collaboration' : html(project.category)}</p>
+        <h3 id="title-${slug}">${html(project.title)}</h3>
+        <p class="project-summary">${html(project.summary)}</p>
+        ${tags(project)}
+        ${links ? `<div class="project-links">${links}</div>` : ''}
       </div>
+      <div class="project-note" data-motion="panel"><h4>My role</h4><p>${html(project.contribution)}</p></div>
+      ${notes}
     </div>
   </article>`;
-}
-
-function caseStudy(project, index) {
-  const number = String(index + 1).padStart(2, '0');
-  const sections = project.sections.map((section, sectionIndex) => `<section class="case-entry" aria-labelledby="evidence-${sectionIndex}">
-    <h2 id="evidence-${sectionIndex}">${html(section.heading)}</h2>
-    <p>${html(section.body)}</p>
-  </section>`).join('\n');
-
-  return `<section class="section case-hero" data-bat-section="Case File ${number}" aria-labelledby="case-title">
-    <div class="container">
-      <a class="text-link case-back" href="../../#work"><span aria-hidden="true">←</span> Selected work</a>
-      <div class="case-grid">
-        <div>
-          <p class="project-meta">${number} / ${html(project.category)}</p>
-          <h1 id="case-title">${html(project.title)}</h1>
-          <p class="case-summary">${html(project.summary)}</p>
-          ${tags(project)}
-        </div>
-        ${projectMedia(project, '../../')}
-      </div>
-    </div>
-  </section>
-  <div class="container case-body">
-    <section class="case-entry" aria-labelledby="contribution">
-      <h2 id="contribution">My contribution</h2>
-      <div>
-        <p>${html(project.contribution)}</p>
-        <div class="case-links">${projectLinks(project)}</div>
-      </div>
-    </section>
-    <div class="case-evidence">${sections}</div>
-  </div>`;
 }
 
 async function cleanOutput() {
@@ -184,8 +164,8 @@ async function cleanOutput() {
 
 export async function build() {
   const load = file => readFile(join(src, file), 'utf8');
-  const [index, caseTemplate, profile, data] = await Promise.all([
-    load('index.html'), load('case.html'), load('profile.html'), load('projects.json'),
+  const [index, expertise, profile, data] = await Promise.all([
+    load('index.html'), load('expertise.html'), load('profile.html'), load('projects.json'),
   ]);
   const { github, projects } = JSON.parse(data);
   const slugs = new Set();
@@ -203,23 +183,14 @@ export async function build() {
     }
   }
 
-  const pages = [['index.html', fill(index, {
-    HEADER: header(''),
-    FOOTER: footer(github, true),
-    PROJECTS: projects.map(projectCard).join('\n'),
+  const page = ['index.html', fill(index, {
+    HEADER: header(),
+    FOOTER: footer(github),
+    EXPERTISE: expertise,
+    PROJECTS: projects.map(projectScene).join('\n'),
     PROFILE: profile,
     GITHUB: external(github),
-  })]];
-
-  for (const [index, project] of projects.entries()) {
-    pages.push([`cases/${project.slug}/index.html`, fill(caseTemplate, {
-      HEADER: header('../../'),
-      FOOTER: footer(github),
-      SUMMARY: html(project.summary),
-      TITLE: html(project.title),
-      CASE: caseStudy(project, index),
-    })]);
-  }
+  })];
 
   const [files, scripts, notices, lenisStyles, portfolioStyles] = await Promise.all([
     Promise.all([...assets, ...screenshots].map(async file => [file, await readFile(join(src, file))])),
@@ -232,12 +203,12 @@ export async function build() {
   ]);
   files.push(['styles.css', `${lenisStyles}\n${portfolioStyles}`]);
   await cleanOutput();
-  await Promise.all([...files, ...scripts, ...notices, ...pages].map(async ([file, contents]) => {
+  await Promise.all([...files, ...scripts, ...notices, page].map(async ([file, contents]) => {
     const output = join(dist, file);
     await mkdir(dirname(output), { recursive: true });
     await writeFile(output, contents);
   }));
-  console.log(`Built ${pages.length} pages in dist.`);
+  console.log('Built the one-page portfolio in dist.');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

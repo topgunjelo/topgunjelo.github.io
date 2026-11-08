@@ -2,6 +2,25 @@
   "github": "https://github.com/topgunjelo",
   "projects": [
     {
+      "slug": "noctime",
+      "title": "NocTime",
+      "category": "Social platform prototype",
+      "visibility": "private",
+      "summary": "An in-development social platform for discovering nightlife events, connecting with people, and sharing experiences after dark.",
+      "technologies": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Express"],
+      "contribution": "Repository collaborator on a team project.",
+      "sections": [
+        {
+          "heading": "The product concept",
+          "body": "The team designed an event discovery experience alongside a social feed, profiles, messaging, and notifications. A shared navigation system connects these core views."
+        },
+        {
+          "heading": "Prototype architecture",
+          "body": "The repository separates a Next.js frontend from an Express backend, with TypeScript on both sides. Interface design is documented, with frontend implementation and mobile optimization in progress."
+        }
+      ]
+    },
+    {
       "slug": "angelsam-travel-tours",
       "title": "AngelSam Travel & Tours",
       "category": "Business website",
@@ -27,23 +46,42 @@
       ]
     },
     {
-      "slug": "amanda-virtual-graduation",
-      "title": "Amanda Virtual Graduation",
-      "category": "Interactive web experience",
-      "summary": "A responsive graduation tribute that unfolds across eight slides with music, confetti, and controls for moving at the visitor’s pace.",
-      "technologies": ["HTML", "CSS", "JavaScript", "Web Audio API", "GitHub Pages"],
-      "contribution": "Built and published the tribute, then refined the responsive ceremony layout and mobile audio playback.",
-      "repository": "https://github.com/topgunjelo/amanda-virtual-graduation",
-      "demo": "https://topgunjelo.github.io/amanda-virtual-graduation/",
-      "screenshot": { "file": "project-graduation.webp", "alt": "Class of 2026 slide with previous, next, and progress controls" },
+      "slug": "marineatlas",
+      "title": "MarineAtlas",
+      "category": "Biodiversity research platform",
+      "summary": "A platform for exploring Philippine marine species, tracking research, and recording community observations on a map.",
+      "technologies": ["Next.js", "React", "TypeScript", "Leaflet", "Supabase"],
+      "contribution": "Implemented frontend features for species discovery, research and observations. Refined the observation feed, map pinning, species detail screens, and authentication flows.",
+      "repository": "https://github.com/Dustin-Martinez/MarineAtlas",
+      "screenshot": { "file": "project-marine-atlas.webp", "alt": "Marine Atlas landing page with a sea turtle, Philippine marine biodiversity introduction, and guest exploration button", "caption": "Landing page screenshot" },
       "sections": [
         {
-          "heading": "Ceremony and navigation",
-          "body": "JavaScript manages slide state, timed advancement, and the closing confetti. Previous and next buttons, keyboard shortcuts, progress dots, and replay let visitors control the eight-slide ceremony."
+          "heading": "Species discovery",
+          "body": "Species filters, detail views, and direct links make the directory easier to browse and share. The interface surfaces species descriptions, media, and supporting facts as visitors explore."
         },
         {
-          "heading": "Playback on mobile",
-          "body": "The opening tap starts the presentation and enables audio. The site can synthesize a short instrumental with the Web Audio API if the audio file fails, and the ceremony includes a pause control."
+          "heading": "Research and observation workflows",
+          "body": "The frontend connects a research workspace with an observation feed and location pinning. Updates to the feed emphasize observation imagery and display species facts from Supabase."
+        }
+      ]
+    },
+    {
+      "slug": "network-guardian-ids",
+      "title": "Network Guardian IDS",
+      "category": "Cybersecurity research prototype",
+      "summary": "A team intrusion detection prototype that evaluates machine learning models on network telemetry and presents results in a security operations dashboard.",
+      "technologies": ["Python", "Node.js", "Express", "Next.js", "scikit-learn", "XGBoost", "PyTorch TabNet"],
+      "contribution": "Implemented the backend inference bridge and input validation, added tests, and contributed to the project’s research manuscript and technical documentation.",
+      "repository": "https://github.com/Dustin-Martinez/network-guardian-ids",
+      "screenshot": { "file": "project-network-guardian.webp", "alt": "Bar chart comparing macro F1 scores for Random Forest, XGBoost, and TabNet on the frozen test set", "caption": "Model evaluation chart" },
+      "sections": [
+        {
+          "heading": "Model evaluation",
+          "body": "The team compares Random Forest, XGBoost, and TabNet on the same network telemetry task. A dashboard presents model predictions and supporting evaluation information."
+        },
+        {
+          "heading": "From API to prediction",
+          "body": "The Express server validates incoming telemetry and calls a Python bridge for inference. Backend and bridge tests cover the handoff, and the technical documentation describes how collaborators can run and extend it."
         }
       ]
     }

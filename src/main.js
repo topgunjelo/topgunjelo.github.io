@@ -5,7 +5,6 @@ const navigation = [...document.querySelectorAll('.desktop-nav a, .mobile-nav a'
 const menu = document.querySelector('.mobile-menu');
 const hero = document.querySelector('.hero');
 const canvas = document.querySelector('#bats');
-const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 let bats;
 
 if (menu) {
@@ -42,7 +41,6 @@ if (hero) {
   updateNavigation();
   addEventListener('scroll', queueNavigation, { passive: true });
   addEventListener('resize', queueNavigation, { passive: true });
-
 }
 
 if (canvas) {
@@ -73,21 +71,6 @@ if (canvas) {
     else setTimeout(startPortfolioEffects, 100);
   }
   initPortfolioMotion();
-
-  let navigatingCase = false;
-  addEventListener('pageshow', () => { navigatingCase = false; });
-  document.addEventListener('click', event => {
-    const link = event.target.closest('[data-case-link]');
-    if (!link || event.defaultPrevented || event.button !== 0 ||
-        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
-        reduced.matches || canvas.dataset.batMode !== 'animated') return;
-    event.preventDefault();
-    if (navigatingCase) return;
-    navigatingCase = true;
-    const visual = link.closest('.project')?.querySelector('[data-bat-reveal]');
-    bats.burst(visual);
-    setTimeout(() => location.assign(link.href), 510);
-  });
 }
 
 
