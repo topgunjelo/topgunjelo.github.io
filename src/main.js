@@ -1,4 +1,5 @@
 import { bindOpening } from './opening.js';
+import { initPortfolioMotion } from './motion.js';
 
 const navigation = [...document.querySelectorAll('.desktop-nav a, .mobile-nav a')];
 const menu = document.querySelector('.mobile-menu');
@@ -42,20 +43,6 @@ if (hero) {
   addEventListener('scroll', queueNavigation, { passive: true });
   addEventListener('resize', queueNavigation, { passive: true });
 
-  if (matchMedia('(pointer: fine)').matches) {
-    hero.addEventListener('pointermove', event => {
-      if (reduced.matches) return;
-      const box = hero.getBoundingClientRect();
-      const x = ((event.clientX - box.left) / box.width - .5) * 21;
-      const y = ((event.clientY - box.top) / box.height - .5) * 12;
-      hero.style.setProperty('--scene-x', x.toFixed(1) + 'px');
-      hero.style.setProperty('--scene-y', y.toFixed(1) + 'px');
-    }, { passive: true });
-    hero.addEventListener('pointerleave', () => {
-      hero.style.removeProperty('--scene-x');
-      hero.style.removeProperty('--scene-y');
-    }, { passive: true });
-  }
 }
 
 if (canvas) {
@@ -72,10 +59,20 @@ if (canvas) {
     bats?.destroy();
     bats = undefined;
   }
-  if (!bindOpening({ onStart: stopBats, onFinish: startBats })) {
-    if ('requestIdleCallback' in window) requestIdleCallback(startBats, { timeout: 600 });
-    else setTimeout(startBats, 100);
+  let bitsStarted = false;
+  function startPortfolioEffects() {
+    startBats();
+    if (bitsStarted || !document.querySelector('[data-react-bits]')) return;
+    bitsStarted = true;
+    import('./bits.jsx').then(({ initReactBits }) => initReactBits()).catch(() => {
+      bitsStarted = false;
+    });
   }
+  if (!bindOpening({ onStart: stopBats, onFinish: startPortfolioEffects })) {
+    if ('requestIdleCallback' in window) requestIdleCallback(startPortfolioEffects, { timeout: 600 });
+    else setTimeout(startPortfolioEffects, 100);
+  }
+  initPortfolioMotion();
 
   let navigatingCase = false;
   addEventListener('pageshow', () => { navigatingCase = false; });

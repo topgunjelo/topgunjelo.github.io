@@ -1,21 +1,48 @@
 import { lstat, mkdir, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { build as bundle } from 'esbuild';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const src = join(root, 'src');
 export const dist = join(root, 'dist');
 
 const assets = [
-  'styles.css', 'main.js', 'opening.js', 'bats.js',
-  'assets/barlow-800.woff2', 'assets/barlow-LICENSE.txt',
   'assets/manrope.woff2', 'assets/manrope-LICENSE.txt',
-  'assets/smoke.webp', 'assets/mark.svg', 'assets/flock.svg',
+  'assets/smoke.webp', 'assets/mark.svg',
 ];
 
+const licenses = [
+  ['react-bits', 'src/components/LICENSE.react-bits.md'],
+  ['react', 'node_modules/react/LICENSE'],
+  ['react-dom', 'node_modules/react-dom/LICENSE'],
+  ['scheduler', 'node_modules/scheduler/LICENSE'],
+  ['lenis', 'node_modules/lenis/LICENSE'],
+];
+
+async function browserFiles() {
+  const { outputFiles } = await bundle({
+    absWorkingDir: root,
+    entryPoints: ['src/main.js'],
+    outdir: dist,
+    chunkNames: 'chunks/[name]-[hash]',
+    bundle: true,
+    splitting: true,
+    format: 'esm',
+    platform: 'browser',
+    target: 'es2022',
+    jsx: 'automatic',
+    define: { 'process.env.NODE_ENV': '"production"' },
+    minify: true,
+    legalComments: 'eof',
+    write: false,
+  });
+
+  return outputFiles.map(file => [relative(dist, file.path), file.contents]);
+}
+
 const nav = [
-  ['home', 'Home'], ['about', 'About'], ['work', 'Work'],
-  ['expertise', 'Expertise'], ['experience', 'Experience'], ['contact', 'Contact'],
+  ['work', 'Work'], ['about', 'About'], ['expertise', 'Expertise'], ['experience', 'Experience'],
 ];
 
 function html(value) {
@@ -43,15 +70,15 @@ function header(prefix) {
 
   return `<header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="${prefix}#home" aria-label="Markie Mojica, home">
-        <span class="brand-mark"><img src="${prefix}assets/mark.svg" alt="" width="34" height="34"></span>
-        <span class="brand-name">Markie <strong>Mojica</strong></span>
+      <a class="brand" href="${prefix}#home">
+        <span class="brand-mark" aria-hidden="true">MM<span>.</span></span>
+        <span class="brand-name">Markie Mojica</span>
       </a>
       <nav class="desktop-nav" aria-label="Main navigation">${links}</nav>
-      <a class="header-contact" href="${prefix}#contact">Get in touch <span aria-hidden="true">↗</span></a>
+      <a class="header-contact" href="${prefix}#contact">Contact <span aria-hidden="true">↗</span></a>
       <details class="mobile-menu">
         <summary>Menu</summary>
-        <nav class="mobile-nav" aria-label="Main navigation">${links}</nav>
+        <nav class="mobile-nav" aria-label="Main navigation">${links}<a href="${prefix}#contact">Contact</a></nav>
       </details>
     </div>
   </header>`;
@@ -82,22 +109,27 @@ function projectLinks(project) {
   return `${repository}\n${demo}`;
 }
 
+function projectMedia(project, prefix = '', decorate = false) {
+  if (!project.screenshot) return '';
+  const { file, alt } = project.screenshot;
+  return `<figure class="project-visual" ${decorate ? 'data-bat-reveal' : ''}>
+    <img src="${prefix}assets/${html(file)}" alt="${html(alt)}" width="1200" height="750" loading="${decorate ? 'lazy' : 'eager'}" decoding="async">
+    ${decorate ? '<div data-react-bits aria-hidden="true"></div>' : ''}
+  </figure>`;
+}
+
 function projectCard(project, index) {
   const number = String(index + 1).padStart(2, '0');
   const slug = project.slug;
-  return `<article class="project" ${index > 0 ? 'data-bat-section="Project reveal"' : ''} aria-labelledby="project-${slug}">
-    <div class="project-visual" data-bat-reveal aria-hidden="true">
-      <span class="project-number">${number}</span>
-      <span class="project-visual-label">Case file ${number}</span>
-      <span class="project-caption">${html(project.category)}</span>
-    </div>
+  return `<article class="project" aria-labelledby="project-${slug}">
+    <div class="project-meta"><span>${number} / ${html(project.category)}</span><span>Live project</span></div>
+    ${projectMedia(project, '', true)}
     <div class="project-copy">
-      <p class="project-category">${html(project.category)}</p>
       <h3 id="project-${slug}">${html(project.title)}</h3>
       <p>${html(project.summary)}</p>
       ${tags(project)}
       <div class="project-links">
-        <a class="button button--primary" href="cases/${slug}/" data-case-link aria-label="Read the ${html(project.title)} case study">Case study <span aria-hidden="true">↗</span></a>
+        <a class="button button--outline" href="cases/${slug}/" data-case-link aria-label="Read the ${html(project.title)} case study">Case study <span aria-hidden="true">↗</span></a>
         ${projectLinks(project)}
       </div>
     </div>
@@ -114,10 +146,15 @@ function caseStudy(project, index) {
   return `<section class="section case-hero" data-bat-section="Case File ${number}" aria-labelledby="case-title">
     <div class="container">
       <a class="text-link case-back" href="../../#work"><span aria-hidden="true">←</span> Selected work</a>
-      <p class="section-kicker"><span>${number}</span><span class="kicker-line"></span> ${html(project.category)}</p>
-      <h1 id="case-title">${html(project.title)}</h1>
-      <p class="case-summary">${html(project.summary)}</p>
-      ${tags(project)}
+      <div class="case-grid">
+        <div>
+          <p class="project-meta">${number} / ${html(project.category)}</p>
+          <h1 id="case-title">${html(project.title)}</h1>
+          <p class="case-summary">${html(project.summary)}</p>
+          ${tags(project)}
+        </div>
+        ${projectMedia(project, '../../')}
+      </div>
     </div>
   </section>
   <div class="container case-body">
@@ -152,11 +189,18 @@ export async function build() {
   ]);
   const { github, projects } = JSON.parse(data);
   const slugs = new Set();
-  for (const { slug } of projects) {
+  const screenshots = new Set();
+  for (const { slug, screenshot } of projects) {
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slugs.has(slug)) {
       throw new Error(`Invalid or duplicate project slug: ${slug}`);
     }
     slugs.add(slug);
+    if (screenshot) {
+      if (!/^[a-z0-9][a-z0-9-]*\.webp$/.test(screenshot.file) || !screenshot.alt?.trim()) {
+        throw new Error(`Expected a WebP screenshot with alternative text for ${slug}`);
+      }
+      screenshots.add(`assets/${screenshot.file}`);
+    }
   }
 
   const pages = [['index.html', fill(index, {
@@ -177,9 +221,18 @@ export async function build() {
     })]);
   }
 
-  const files = await Promise.all(assets.map(async file => [file, await readFile(join(src, file))]));
+  const [files, scripts, notices, lenisStyles, portfolioStyles] = await Promise.all([
+    Promise.all([...assets, ...screenshots].map(async file => [file, await readFile(join(src, file))])),
+    browserFiles(),
+    Promise.all(licenses.map(async ([name, file]) => [
+      `assets/licenses/${name}.txt`, await readFile(join(root, file)),
+    ])),
+    readFile(join(root, 'node_modules/lenis/dist/lenis.css'), 'utf8'),
+    load('styles.css'),
+  ]);
+  files.push(['styles.css', `${lenisStyles}\n${portfolioStyles}`]);
   await cleanOutput();
-  await Promise.all([...files, ...pages].map(async ([file, contents]) => {
+  await Promise.all([...files, ...scripts, ...notices, ...pages].map(async ([file, contents]) => {
     const output = join(dist, file);
     await mkdir(dirname(output), { recursive: true });
     await writeFile(output, contents);

@@ -10,7 +10,7 @@
       "contribution": "Redesigned the site, added guest reviews, improved the tour inquiry flow, and configured deployment to GitHub Pages.",
       "repository": "https://github.com/angelsamtravelandtours/angelsam-travel-tours",
       "demo": "https://angelsamtravels.com/",
-      "art": "travel",
+      "screenshot": { "file": "project-angelsam.webp", "alt": "AngelSam Travel & Tours homepage with a Philippine coastline and trip-planning buttons" },
       "sections": [
         {
           "heading": "Tour discovery",
@@ -35,7 +35,7 @@
       "contribution": "Built and published the tribute, then refined the responsive ceremony layout and mobile audio playback.",
       "repository": "https://github.com/topgunjelo/amanda-virtual-graduation",
       "demo": "https://topgunjelo.github.io/amanda-virtual-graduation/",
-      "art": "graduation",
+      "screenshot": { "file": "project-graduation.webp", "alt": "Class of 2026 slide with previous, next, and progress controls" },
       "sections": [
         {
           "heading": "Ceremony and navigation",
