@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion, useScroll } from 'motion/react';
-import { ArrowUp, ArrowUpRight, Check, Copy, MapPin, Phone, RotateCcw } from 'lucide-react';
-import { site } from '../content/site';
+import { ArrowUp, ArrowUpRight, Check, Copy, MapPin, Phone, RotateCcw } from 'lucide-react';import { site } from '../content/site';
 import { useApp } from '../lib/app-context';
 import { scrollToSection, usePauseOffscreen, useRange } from '../lib/hooks';
+import { useOrbMode } from '../orb/OrbLayer';
 import { GitHubMark } from './icons';
 import { Lens } from './Lens';
 import { Magnetic } from './Magnetic';
@@ -18,6 +18,7 @@ export function Contact() {
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
   const visible = usePauseOffscreen(ref);
+  const particles = useOrbMode() === 'particles';
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end end'] });
   const lensScale = useRange(scrollYProgress, [0, 1], [reduced ? 1 : 0.4, 1]);
   const lensY = useRange(scrollYProgress, [0, 1], [reduced ? 0 : 120, 0]);
@@ -25,9 +26,15 @@ export function Contact() {
   return (
     <section ref={ref} id="contact" className="chapter contact" aria-labelledby="contact-title">
       <div className="container contact-inner">
-        <motion.div className="contact-lens" style={{ scale: lensScale, y: lensY }}>
-          <Lens spinning={visible && !reduced} />
-        </motion.div>
+        {particles ? (
+          // The orb arrives from above and assembles into a telephone here.
+          <div className="contact-lens contact-lens--orb orb-anchor" data-orb="contact" aria-hidden="true" />
+        ) : (
+          <motion.div className="contact-lens" style={{ scale: lensScale, y: lensY }} aria-hidden="true">
+            <Lens spinning={visible && !reduced} />
+            <Phone className="contact-lens-icon" strokeWidth={1.6} />
+          </motion.div>
+        )}
 
         <Eyebrow index="05">Contact</Eyebrow>
         <Reveal>

@@ -1,0 +1,32 @@
+.orb-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+/* Anchors: invisible boxes that tell the engine where each formation lives. */
+.orb-anchor {
+  position: relative;
+  aspect-ratio: 1;
+}
+
+/* The restrained glow behind the hero sphere; fades as the orb dissolves. */
+.orb-aura {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 38%, rgba(70, 150, 255, 0.2), transparent 58%),
+    radial-gradient(circle at 68% 64%, rgba(160, 130, 255, 0.18), transparent 58%);
+  filter: blur(30px);
+  opacity: var(--orb-hero, 1);
+  pointer-events: none;
+}
+
+.orb-aura--soft {
+  inset: -6%;
+  opacity: 0.7;
+}

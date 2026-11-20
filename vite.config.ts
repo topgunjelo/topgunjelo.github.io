@@ -10,5 +10,7 @@ export default defineConfig({
   build: {
     target: 'es2022',
     assetsInlineLimit: 2048,
+    // The lazily loaded orb engine (Three.js) is ~540 kB raw / ~136 kB gzipped by design.
+    chunkSizeWarningLimit: 600,
   },
 });

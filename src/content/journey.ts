@@ -34,7 +34,6 @@ export const journey: JourneyEntry[] = [
     title: 'BS Computer Science, Digital Forensics',
     org: 'National University — Manila',
     meta: '2024 – 2028 (expected) · Third-year student',
-    highlights: ['Dean’s First Honors List'],
   },
   {
     year: '2025',
@@ -57,7 +56,6 @@ export const credentials = [
   {
     group: 'Honors',
     items: [
-      { title: 'Dean’s First Honors List', detail: 'National University — Manila' },
       { title: 'Graduated with Highest Honors', detail: 'LMI Integrated Formation and Education, Inc. · GWA 95.69' },
     ],
   },

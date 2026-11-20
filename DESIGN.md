@@ -5,7 +5,8 @@ From Markie's rebuild brief (2026-11-20). Read before changing layout or motion.
 ## Direction
 
 - **Apple-inspired and mostly white.** About 80–90% of the page is white or near-white. Color comes from objects (the lens, logos, gradients, hover glows), not from backgrounds.
-- **One visual object: the lens.** A glass sphere of slow blue/cyan/lavender light. It's the intro's point of light, the hero sculpture, and the closing image in Contact. It stands for looking closer, at interfaces and at evidence. Don't add a second decorative system.
+- **One visual object: the orb.** It's one persistent particle system (`src/orb/`) that travels the page, not a repeated decoration. It starts as a dot-matrix sphere in the hero, dissolves into small black particles that stream down and fill the About statement word by word, re-forms as a companion beside "Where my curiosity lives" (a window, cube, shield or play button for rows 01–04), and assembles into a 3D telephone in Contact. The cursor scatters particles anywhere; springs bring them home. Don't add a second decorative system.
+- **Fallback.** With reduced motion or no WebGL, every orb spot shows the static glass lens (`Lens.tsx`), and Contact shows a phone on the lens. The intro always uses the CSS lens, and the particles take over when it lands.
 - **Headline:** "I build what you see. I study what's hidden." It ties frontend work to digital forensics.
 - **Every chapter has its own composition.** About is a scroll-lit statement plus an editorial list. Skills is a floating logo constellation. Projects alternate between a feature window, a flow diagram, a pair, splits and a lab grid. Experience is a timeline with a drawing rail. Contact is a centered close. Avoid repeated card grids.
 
@@ -25,10 +26,17 @@ All values live in `src/styles/tokens.css`. Use the tokens; don't add raw hex va
 - Looping CSS animations sit under `usePauseOffscreen` so they stop when out of view.
 - Pointer effects (tilt, parallax, magnetic buttons) only run with a fine pointer and without reduced motion. Hover is never the only way to reach information.
 
+### Orb engine notes
+
+- Each particle keeps its identity and has a target in every station (hero, text, companion, contact). Scroll progress per leg is staggered per particle, so the orb dissolves and re-forms instead of sliding, and it reverses exactly when scrolling back up.
+- About text dots use the same timing as the word fade in `ScrollLitText`. Change one, change both.
+- Anchors are plain elements with `data-orb="hero|text|zone|companion|contact"`. The engine reads their rects each frame, so layout changes need no engine changes.
+- 5,200 particles on desktop, 2,600 on small or low-core devices. Nothing is drawn while no particle is on screen.
+
 ## Content
 
 - **Concise and factual.** No invented metrics, titles, dates or achievements. Collaborator access alone doesn't prove someone authored a feature.
 - Private projects show high-level summaries only, with no links or screenshots.
 - No portrait is published until an approved photo exists. Don't use generated people.
 - The GWA (95.69) appears with the LMI Highest Honors. The 2026-11-20 rebuild brief asked for it, which overrides the earlier "GWA never appears" rule.
-- Logos come from Devicon (MIT). Lightroom and Premiere Pro are drawn in Adobe's tile style. CapCut has no openly licensed mark, so it gets a neutral tile.
+- Logos come from Devicon (MIT). Lightroom and Premiere Pro are drawn in Adobe's tile style, and Microsoft Word and Teams as simplified Microsoft 365-style tiles; none of these is official artwork. CapCut has no openly licensed mark, so it gets a neutral tile.

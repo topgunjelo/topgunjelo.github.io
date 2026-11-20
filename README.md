@@ -31,6 +31,7 @@ npm run preview   # serve dist/
 | `src/content/stack.ts` | Tech-stack logos, categories, notes, capabilities |
 | `src/content/journey.ts` | Education, experience, credentials |
 | `src/components/` | One component per chapter, plus the shared pieces (Lens, Intro, Nav, CommandPalette, CaseStudy) |
+| `src/orb/` | The particle orb: Three.js engine, formations (sphere, text, window, cube, shield, play, phone), shared state |
 | `src/styles/tokens.css` | Every color, size, radius, shadow and timing |
 | `src/assets/logos/` | Technology logos (Devicon, MIT — see `LICENSE-devicon.txt`) |
 | `src/assets/projects/` | Project screenshots (WebP, 1200×750) |

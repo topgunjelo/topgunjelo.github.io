@@ -13,18 +13,18 @@
   text-wrap: balance;
 }
 
+/* List on the left; the orb companion holds its place on the right while the rows scroll. */
 .about-body {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: clamp(2rem, 1rem + 5vw, 7rem);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(2rem, 1rem + 5vw, 6rem);
   align-items: start;
 }
 
-.about-aside {
-  position: sticky;
-  top: calc(var(--nav-h) + 48px);
+.about-intro {
   display: grid;
   gap: 14px;
+  margin-bottom: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
 }
 
 .about-aside-title {
@@ -34,9 +34,20 @@
 }
 
 .about-aside-text {
-  max-width: 26rem;
+  max-width: 34rem;
   color: var(--ink-2);
   text-wrap: pretty;
+}
+
+.about-companion {
+  position: sticky;
+  top: calc(50vh - min(30vw, 22rem) / 2 + var(--nav-h) / 2);
+  display: grid;
+  place-items: center;
+}
+
+.companion-anchor {
+  width: min(30vw, 22rem);
 }
 
 .interests {
@@ -64,6 +75,7 @@
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: var(--ink-3);
+  transition: color var(--dur-3) var(--ease-out);
 }
 
 .interest-title {
@@ -82,24 +94,11 @@
   text-wrap: pretty;
 }
 
-.interest-orb {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 56px;
-  height: 56px;
-  margin-top: -28px;
-  border-radius: 50%;
-  opacity: 0;
-  transform: scale(0.4);
-  transition: opacity var(--dur-3) var(--ease-out), transform 700ms var(--ease-out);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 10px 30px -8px rgba(40, 60, 150, 0.35);
-}
-
-.interest-orb--blue { background: radial-gradient(circle at 35% 30%, #fff, #7cbcff 45%, #2a7fff); }
-.interest-orb--cyan { background: radial-gradient(circle at 35% 30%, #fff, #8ee6fa 45%, #2bb4e8); }
-.interest-orb--lavender { background: radial-gradient(circle at 35% 30%, #fff, #c6b5ff 45%, #8a6cf2); }
-.interest-orb--silver { background: radial-gradient(circle at 35% 30%, #fff, #dcdce4 45%, #a3a3b0); }
+/* Each row's index picks up the color the orb turns when that row is focused. */
+.interest[data-tone='blue'] { --tone: #2a73fa; }
+.interest[data-tone='cyan'] { --tone: #14a8db; }
+.interest[data-tone='lavender'] { --tone: #8461f0; }
+.interest[data-tone='silver'] { --tone: #66759e; }
 
 @media (hover: hover) {
   .interests:hover .interest {
@@ -110,18 +109,12 @@
     opacity: 1;
   }
 
-  .interest:hover .interest-orb {
-    opacity: 1;
-    transform: scale(1);
-  }
-
   .interest:hover .interest-title {
     transform: translateX(6px);
   }
 
-  .interest-title,
-  .interest-body {
-    padding-right: 76px;
+  .interest:hover .interest-index {
+    color: var(--tone);
   }
 }
 
@@ -157,8 +150,14 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .about-aside {
+  /* On phones the orb sits above the list; the row in the middle of the screen drives it. */
+  .about-companion {
     position: static;
+    order: -1;
+  }
+
+  .companion-anchor {
+    width: min(58vw, 17rem);
   }
 
   .facts {

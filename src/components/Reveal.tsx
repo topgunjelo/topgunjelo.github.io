@@ -34,7 +34,7 @@ export function Reveal({
 }
 
 /** Words light up one by one as the reader scrolls through them. */
-export function ScrollLitText({ text, className }: { text: string; className?: string }) {
+export function ScrollLitText({ text, className, orb }: { text: string; className?: string; orb?: string }) {
   const ref = useRef<HTMLParagraphElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.5'] });
@@ -47,11 +47,13 @@ export function ScrollLitText({ text, className }: { text: string; className?: s
     );
   }
   return (
-    <p ref={ref} className={className}>
+    <p ref={ref} className={className} data-orb={orb}>
       <span className="visually-hidden">{text}</span>
       <span aria-hidden="true">
         {words.map((word, index) => (
-          <Word key={index} progress={scrollYProgress} range={[index / words.length, (index + 1) / words.length]}>
+          // Same timing the orb engine uses to land particles on word `index`, so each word
+          // darkens as its dots arrive.
+          <Word key={index} progress={scrollYProgress} range={[(index / words.length) * 0.84 + 0.04, (index / words.length) * 0.84 + 0.18]}>
             {word}
           </Word>
         ))}
@@ -64,7 +66,9 @@ function Word({ children, progress, range }: { children: string; progress: Motio
   const opacity = useRange(progress, range, [0.14, 1]);
   return (
     <>
-      <motion.span style={{ opacity }}>{children}</motion.span>{' '}
+      <motion.span className="lit-word" style={{ opacity }}>
+        {children}
+      </motion.span>{' '}
     </>
   );
 }

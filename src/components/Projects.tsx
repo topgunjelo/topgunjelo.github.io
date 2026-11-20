@@ -46,7 +46,7 @@ export function Projects() {
                 </div>
               );
             }
-            return <Split key={item.slug} project={item.project} index={next()} flip={item.layout === 'split-left'} />;
+            return <Split key={item.slug} project={item.project} index={next()} flip={false} />;
           })}
         </div>
 

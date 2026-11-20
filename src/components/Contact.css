@@ -11,8 +11,22 @@
 }
 
 .contact-lens {
+  position: relative;
   width: clamp(7rem, 5rem + 8vw, 11rem);
   margin-bottom: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+}
+
+.contact-lens--orb {
+  width: clamp(9rem, 6rem + 9vw, 14rem);
+  margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+}
+
+.contact-lens-icon {
+  position: absolute;
+  inset: 32%;
+  width: 36%;
+  height: 36%;
+  color: #fff;
 }
 
 .contact-title {

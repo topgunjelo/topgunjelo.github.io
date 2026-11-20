@@ -15,6 +15,7 @@ import { Journey } from './components/Journey';
 import { Nav } from './components/Nav';
 import { Projects } from './components/Projects';
 import { Skills } from './components/Skills';
+import { OrbLayer, useOrbMode } from './orb/OrbLayer';
 
 type Phase = 'intro' | 'handoff' | 'done';
 
@@ -37,6 +38,7 @@ export function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toast, setToast] = useState<{ id: number; message: string } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const orbMode = useOrbMode();
 
   const onHandoff = useCallback(() => setPhase(current => (current === 'intro' ? 'handoff' : current)), []);
   const onDone = useCallback(() => {
@@ -117,6 +119,9 @@ export function App() {
         <AnimatePresence>
           {phase !== 'done' && <Intro key={introKey} onHandoff={onHandoff} onDone={onDone} />}
         </AnimatePresence>
+
+        {/* The particle orb takes over from the intro's lens once the intro has landed. */}
+        {orbMode === 'particles' && phase === 'done' && <OrbLayer />}
 
         <div className="app" inert={phase !== 'done'}>
           <a className="skip-link" href="#main">

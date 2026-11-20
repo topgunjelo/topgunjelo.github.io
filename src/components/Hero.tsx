@@ -10,6 +10,7 @@ import {
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import { site } from '../content/site';
 import { scrollToSection, useFinePointer, usePauseOffscreen, useRange } from '../lib/hooks';
+import { useOrbMode } from '../orb/OrbLayer';
 import { Lens } from './Lens';
 import { Magnetic } from './Magnetic';
 import { NameGlyphs } from './Name';
@@ -60,10 +61,12 @@ export function Hero({ revealed, coreHidden, standalone }: Props) {
     return () => removeEventListener('pointermove', onMove);
   }, [fine, coreHidden, inView, rawX, rawY]);
 
-  // Leaving the hero: the lens drifts up and recedes, the copy dims.
+  // Leaving the hero: the copy dims. In particle mode the orb itself dissolves downward into About;
+  // the static lens drifts up and recedes instead.
+  const particles = useOrbMode() === 'particles';
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const lensY = useRange(scrollYProgress, [0, 1], [0, reduced ? 0 : -140]);
-  const lensScale = useRange(scrollYProgress, [0, 1], [1, reduced ? 1 : 0.82]);
+  const lensY = useRange(scrollYProgress, [0, 1], [0, reduced || particles ? 0 : -140]);
+  const lensScale = useRange(scrollYProgress, [0, 1], [1, reduced || particles ? 1 : 0.82]);
   const copyOpacity = useRange(scrollYProgress, [0, 0.65], [1, 0]);
   const copyY = useRange(scrollYProgress, [0, 1], [0, reduced ? 0 : 60]);
 
@@ -124,14 +127,15 @@ export function Hero({ revealed, coreHidden, standalone }: Props) {
 
           <motion.div className="hero-visual" style={{ y: lensY, scale: lensScale }}>
             <motion.div
-              className="hero-lens"
+              className="hero-lens orb-anchor"
               data-hero-lens
+              data-orb={particles ? 'hero' : undefined}
               style={coreStyle}
               initial={standalone ? { opacity: 0, scale: 0.86 } : false}
               animate={standalone && revealed ? { opacity: 1, scale: 1 } : undefined}
               transition={{ duration: 1.3, ease }}
             >
-              <Lens px={px} py={py} spinning={!coreHidden && !reduced} />
+              {particles ? <div className="orb-aura" /> : <Lens px={px} py={py} spinning={!coreHidden && !reduced} />}
             </motion.div>
           </motion.div>
         </div>

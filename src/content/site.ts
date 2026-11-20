@@ -54,6 +54,6 @@ export const about = {
   facts: [
     { label: 'Based in', value: 'Mariveles, Bataan' },
     { label: 'Studying', value: 'BS Computer Science, Digital Forensics' },
-    { label: 'Recognition', value: 'Dean’s First Honors List' },
+    { label: 'Open to', value: 'Internships, freelance and collaboration' },
   ],
 } as const;

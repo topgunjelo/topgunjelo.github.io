@@ -50,6 +50,8 @@ export const stack: Tech[] = [
   { id: 'github', name: 'GitHub', category: 'tools', color: '#1D1D1F', depth: 0.9, note: 'Collaboration, pull requests and GitHub Pages deployments.' },
   { id: 'git', name: 'Git', category: 'tools', color: '#F05032', depth: 0.45, note: 'Version control on every project.' },
   { id: 'latex', name: 'LaTeX', category: 'tools', color: '#008080', depth: 0.75, note: 'Typesetting research papers, including the AEGIS-NTFS manuscript.' },
+  { id: 'msword', name: 'Microsoft Word', category: 'tools', color: '#185ABD', depth: 0.6, note: 'Research papers, reports and documentation.' },
+  { id: 'msteams', name: 'Microsoft Teams', category: 'tools', color: '#5B5FC7', depth: 0.85, note: 'Team communication, meetings and shared files.' },
 ];
 
 export const capabilities = [

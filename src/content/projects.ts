@@ -44,7 +44,6 @@ export const showcase = [
   { slug: 'marineatlas', layout: 'pair' },
   { slug: 'network-guardian-ids', layout: 'pair' },
   { slug: 'stockflow-pro', layout: 'split-right' },
-  { slug: 'amanda-virtual-graduation', layout: 'split-left' },
 ] as const;
 
 export const lab = ['noctime', 'aegis-ntfs', 'sponge'] as const;
