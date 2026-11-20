@@ -23,7 +23,9 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      # npm install, not npm ci: the lockfile is generated on Windows and omits the
+      # Linux-only optional packages the build tools need on the runner.
+      - run: npm install --no-audit --no-fund
       # Lint, type-check, tests, then the production build into dist/.
       - run: npm run check
       - uses: actions/upload-pages-artifact@v3
