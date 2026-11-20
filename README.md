@@ -21,6 +21,10 @@ npm run preview   # serve dist/
 
 `dist/` is a static site with relative paths, so any static host works.
 
+## Deploy
+
+The site is live at <https://topgunjelo.github.io/>. Every push to `main` runs `.github/workflows/deploy.yml`, which checks and builds the site and publishes `dist/` to GitHub Pages.
+
 ## Where things live
 
 | Path | What it holds |
