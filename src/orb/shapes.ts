@@ -188,7 +188,8 @@ export function fit(pts: number[][], n: number, jitter: number): Points3 {
   return out;
 }
 
-export type TextTargets = { points: Float32Array; words: Uint16Array; wordCount: number };
+/** Points are in px relative to the container's box at sampling time (`width` × `height`). */
+export type TextTargets = { points: Float32Array; words: Uint16Array; wordCount: number; width: number; height: number };
 
 /**
  * Samples the glyphs of a block of words, in place, as dot positions relative to the
@@ -248,5 +249,5 @@ export function sampleText(container: HTMLElement, wordSelector: string, n: numb
     points[i * 2 + 1] = p[1] + (Math.random() - 0.5) * j;
     wordIds[i] = p[2];
   }
-  return { points, words: wordIds, wordCount: words.length };
+  return { points, words: wordIds, wordCount: words.length, width: box.width, height: box.height };
 }

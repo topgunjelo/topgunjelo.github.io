@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, stagger, useAnimate, useReducedMotion } from 'motion/react';
 import { site } from '../content/site';
 import { useScrollLock } from '../lib/hooks';
+import { useOrbMode } from '../orb/OrbLayer';
+import { orbStore } from '../orb/store';
 import { Lens } from './Lens';
 import { NameGlyphs } from './Name';
 import './Intro.css';
@@ -29,6 +31,9 @@ export function Intro({ onHandoff, onDone }: Props) {
   const nameRef = useRef<HTMLParagraphElement>(null);
   const finished = useRef(false);
   const reduced = useReducedMotion();
+  const particleMode = useOrbMode() === 'particles';
+  // The CSS lens only appears when the particle orb can't tell the story.
+  const [classic, setClassic] = useState(false);
   useScrollLock(true);
 
   useEffect(() => {
@@ -37,6 +42,8 @@ export function Intro({ onHandoff, onDone }: Props) {
     const finish = () => {
       if (finished.current) return;
       finished.current = true;
+      // Particles hand over to the page formation (the hero sphere) without a jump.
+      orbStore.setIntroStage(null);
       onHandoff();
       onDone();
     };
@@ -57,6 +64,11 @@ export function Intro({ onHandoff, onDone }: Props) {
       scrollTo(0, 0);
       await Promise.race([document.fonts.ready, wait(900)]);
       if (cancelled) return;
+      // The particle orb tells the whole story when it's available; give it a moment to load.
+      if (particleMode && (await orbStore.whenReady(1500))) return playParticles();
+      if (cancelled) return;
+      setClassic(true);
+      await wait(40); // let the lens element mount
 
       const orb = orbRef.current!;
       const anchor = anchorRef.current!.getBoundingClientRect();
@@ -130,13 +142,66 @@ export function Intro({ onHandoff, onDone }: Props) {
       if (!cancelled) finish();
     }
 
+    /**
+     * The particle version, one continuous object:
+     * Scene 1 — scattered particles gather into a small dot-matrix orb.
+     * Scene 2 — the orb pours into the letters of the name; each letter sharpens as its dots land.
+     * Scene 3 — the name glides into the hero heading while its particles become the hero sphere.
+     */
+    async function playParticles() {
+      orbStore.setIntroStage('gather');
+      await wait(1350);
+      if (cancelled) return;
+
+      orbStore.setIntroStage('name');
+      // Left to right, in step with the engine's per-letter arrival delay.
+      animate(
+        '.intro-char',
+        { opacity: [0, 1], filter: ['blur(12px)', 'blur(0px)'] },
+        { duration: 0.8, ease: settle, delay: stagger(0.045, { startDelay: 0.4 }) },
+      );
+      await wait(1500);
+      if (cancelled) return;
+      await animate(
+        '.intro-role',
+        { opacity: [0, 1], y: [10, 0], filter: ['blur(8px)', 'blur(0px)'] },
+        { duration: 0.75, ease: settle, delay: stagger(0.16) },
+      );
+      await wait(550);
+      const heroName = document.querySelector<HTMLElement>('[data-hero-name]');
+      if (cancelled || !heroName) return finish();
+
+      onHandoff();
+      orbStore.setIntroStage('hero');
+      const name = nameRef.current!;
+      const from = name.getBoundingClientRect();
+      const to = heroName.getBoundingClientRect();
+      await Promise.all([
+        animate(scope.current, { backgroundColor: 'rgba(255,255,255,0)' }, { duration: 0.7, ease: 'easeOut' }),
+        animate('.intro-roles', { opacity: 0, y: -8 }, { duration: 0.35, ease: 'easeIn' }),
+        animate('.intro-skip', { opacity: 0 }, { duration: 0.25 }),
+        animate(
+          name,
+          {
+            x: to.left + to.width / 2 - (from.left + from.width / 2),
+            y: to.top + to.height / 2 - (from.top + from.height / 2),
+            scale: to.width / from.width,
+          },
+          { duration: 1.15, ease: glide },
+        ),
+        wait(1300),
+      ]);
+      if (!cancelled) finish();
+    }
+
     play();
     return () => {
       cancelled = true;
+      orbStore.setIntroStage(null);
       removeEventListener('keydown', onKey);
       removeEventListener('resize', skip);
     };
-  }, [animate, onDone, onHandoff, reduced, scope]);
+  }, [animate, onDone, onHandoff, reduced, scope, particleMode]);
 
   return (
     <motion.div
@@ -144,12 +209,14 @@ export function Intro({ onHandoff, onDone }: Props) {
       className="intro"
       exit={{ opacity: 0, transition: { duration: 0.45, ease: 'easeOut' } }}
     >
-      <div ref={orbRef} className="intro-orb" aria-hidden="true">
-        <Lens />
-      </div>
+      {classic && (
+        <div ref={orbRef} className="intro-orb" aria-hidden="true">
+          <Lens />
+        </div>
+      )}
       <div className="intro-stage" aria-hidden="true">
-        <div ref={anchorRef} className="intro-anchor" />
-        <p ref={nameRef} className="intro-name name-type">
+        <div ref={anchorRef} className="intro-anchor" data-orb={classic ? undefined : 'intro-orb'} />
+        <p ref={nameRef} className="intro-name name-type" data-orb="intro-name">
           <NameGlyphs className="name-char intro-char" />
         </p>
         <p className="intro-roles">
@@ -166,6 +233,7 @@ export function Intro({ onHandoff, onDone }: Props) {
         onClick={() => {
           if (!finished.current) {
             finished.current = true;
+            orbStore.setIntroStage(null);
             onHandoff();
             onDone();
           }

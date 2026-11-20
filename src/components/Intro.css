@@ -36,6 +36,12 @@
   margin-bottom: clamp(0.5rem, 0.2rem + 1.2vw, 1.25rem);
 }
 
+/* In particle mode the anchor is where the first small orb gathers. */
+.intro-anchor[data-orb] {
+  width: 120px;
+  height: 120px;
+}
+
 .intro-name {
   font-size: min(calc((100vw - 2 * var(--gutter)) / 8.8), 8rem);
   transform-origin: 50% 50%;

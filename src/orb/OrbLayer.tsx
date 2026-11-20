@@ -14,8 +14,13 @@ export function useOrbMode(): 'particles' | 'static' {
  * One fixed, full-viewport canvas for the whole page. It ignores the pointer (it reads
  * window events instead), so it never blocks links or text selection underneath.
  */
-export function OrbLayer() {
+/**
+ * Mounted for the whole visit in particle mode, including the intro, which the particles play.
+ * `assemble` resolves the hero sphere from its center when the page opened without the intro.
+ */
+export function OrbLayer({ assemble }: { assemble: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
+  const assembleRef = useRef(assemble);
   useEffect(() => {
     const host = ref.current;
     if (!host) return;
@@ -32,7 +37,8 @@ export function OrbLayer() {
       .then(({ OrbEngine }) => {
         if (cancelled) return;
         engine = new OrbEngine(canvas);
-        orbStore.assemble();
+        if (assembleRef.current) orbStore.assemble();
+        orbStore.setReady(true);
       })
       .catch(() => {
         // No usable WebGL (or the chunk failed): every orb spot switches to the static lens.
@@ -40,6 +46,7 @@ export function OrbLayer() {
       });
     return () => {
       cancelled = true;
+      orbStore.setReady(false);
       engine?.dispose();
       canvas.remove();
     };

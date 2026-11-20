@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { cube, phone, play, sampleText, shield, sphere, windowShape, type TextTargets } from './shapes';
-import { orbStore } from './store';
+import { orbStore, type IntroStage } from './store';
 
 /**
  * The orb: one persistent set of particles that travels through the page.
@@ -98,7 +98,16 @@ export class OrbEngine {
   private disposed = false;
   private resizeTimer = 0;
 
+  // Intro: particles follow their own smoothed positions and style while a scene plays.
+  private readonly introPos: Float32Array; // x, y
+  private readonly introSty: Float32Array; // r, g, b, a, size
+  private introStage: IntroStage = null;
+  private introT = 0;
+  private nameText: TextTargets | null = null;
+  private readonly canvas: HTMLCanvasElement;
+
   constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     const small = innerWidth < 760 || (navigator.hardwareConcurrency ?? 8) <= 4;
     this.n = small ? 2600 : 5200;
     const n = this.n;
@@ -132,6 +141,8 @@ export class OrbEngine {
     this.phoneP = phone(n);
     this.companionShapes = [this.sphereP, windowShape(n), cube(n), shield(n), play(n)];
     this.comp = new Float32Array(this.sphereP);
+    this.introPos = new Float32Array(n * 2);
+    this.introSty = new Float32Array(n * 5);
 
     for (let i = 0; i < n; i++) {
       this.seed[i * 4] = (Math.random() - 0.5) * 2; // arc direction and amount
@@ -299,6 +310,24 @@ export class OrbEngine {
     let visible = 0;
     const n = this.n;
 
+    // ---------- Intro scenes ----------
+    const stage = orbStore.introStage;
+    const endingIntro = !stage && this.introStage !== null;
+    if (stage !== this.introStage) {
+      if (stage && !this.introStage) this.scatterForIntro(vw, vh);
+      if (stage === 'name') this.sampleName();
+      this.introStage = stage;
+      this.introT = 0;
+    }
+    this.introT += dt;
+    // While the intro plays, the particles draw above its white stage.
+    this.canvas.style.zIndex = stage ? '101' : '';
+    const introOrb = stage === 'gather' ? this.box('intro-orb') : null;
+    const nameBox = stage === 'name' ? this.box('intro-name') : null;
+    const introRot = rotation(t * 0.5, -0.3);
+    const nameText = this.nameText;
+    const nameScale = nameBox && nameText ? nameBox.w / nameText.width : 1;
+
     for (let i = 0; i < n; i++) {
       const s4 = i * 4;
       const jitter = this.seed[s4 + 1];
@@ -434,6 +463,80 @@ export class OrbEngine {
         }
       }
 
+      // Intro: particles play their own scene, easing toward each scene's targets with a
+      // per-particle delay and rate, so every change reads as a flow rather than a cut.
+      if (stage) {
+        const ip = i * 2;
+        const is = i * 5;
+        // 'hero' scene: the targets are simply the hero sphere computed above.
+        let tx = x;
+        let ty = y;
+        let tr = r;
+        let tg = g;
+        let tb = b;
+        let ta = a;
+        let ts = size;
+        let delay = jitter * 0.35;
+        if (stage === 'gather') {
+          if (introOrb) {
+            const q = rotate(this.sphereP, i, introRot);
+            const ff = ((q[2] + 1) / 2) ** 2;
+            tx = introOrb.cx + q[0] * introOrb.r;
+            ty = introOrb.cy + q[1] * introOrb.r;
+            tr = this.grad[i * 3];
+            tg = this.grad[i * 3 + 1];
+            tb = this.grad[i * 3 + 2];
+            ts = 0.8 + 1.4 * ff;
+            // Only every third particle shows in the small orb, so it reads as a crisp
+            // dot-matrix sphere; the rest travel unseen and appear as they reach the name.
+            ta = i % 3 === 0 ? 0.15 + 0.75 * ff : 0;
+          } else {
+            tx = this.introPos[ip];
+            ty = this.introPos[ip + 1];
+          }
+          delay = jitter * 0.25;
+        } else if (stage === 'name') {
+          if (nameBox && nameText) {
+            const along = nameText.points[ip] / nameText.width;
+            tx = nameBox.x + nameText.points[ip] * nameScale;
+            ty = nameBox.y + nameText.points[ip + 1] * nameScale;
+            // Left to right, matching the order the letters sharpen in the DOM.
+            delay = along * 0.55 + jitter * 0.12;
+            tr = INK[0];
+            tg = INK[1];
+            tb = INK[2];
+            ts = clamp(nameBox.h / 64, 1.2, 2.3);
+            // Once a letter is solid, its dots quiet down and leave the type crisp.
+            ta = this.introT > delay + 1.1 ? 0.22 : 0.9;
+          } else {
+            tx = this.introPos[ip];
+            ty = this.introPos[ip + 1];
+            delay = 0;
+          }
+        }
+        // Scene 1 converges faster so the small orb settles into a crisp sphere before it pours.
+        const rate = this.seed[s4 + 2] * (stage === 'gather' ? 1.9 : 1.1);
+        const k = this.introT >= delay ? 1 - Math.exp(-dt * rate) : 0;
+        this.introPos[ip] += (tx - this.introPos[ip]) * k;
+        this.introPos[ip + 1] += (ty - this.introPos[ip + 1]) * k;
+        this.introSty[is] += (tr - this.introSty[is]) * k;
+        this.introSty[is + 1] += (tg - this.introSty[is + 1]) * k;
+        this.introSty[is + 2] += (tb - this.introSty[is + 2]) * k;
+        this.introSty[is + 3] += (ta - this.introSty[is + 3]) * k;
+        this.introSty[is + 4] += (ts - this.introSty[is + 4]) * k;
+        x = this.introPos[ip];
+        y = this.introPos[ip + 1];
+        r = this.introSty[is];
+        g = this.introSty[is + 1];
+        b = this.introSty[is + 2];
+        a = this.introSty[is + 3];
+        size = this.introSty[is + 4];
+      } else if (endingIntro) {
+        // Hand over without a jump: the gap to the page formation becomes spring displacement.
+        this.disp[i * 2] += this.introPos[i * 2] - x;
+        this.disp[i * 2 + 1] += this.introPos[i * 2 + 1] - y;
+      }
+
       // Cursor physics: repel within a speed-dependent radius, spring home, damp.
       const d2 = i * 2;
       let dx = this.disp[d2];
@@ -492,6 +595,27 @@ export class OrbEngine {
     this.colAttr.needsUpdate = true;
     this.renderer.render(this.scene, this.camera);
   };
+
+  /** Scene 1 starts from nothing: particles scattered across the screen, fully transparent. */
+  private scatterForIntro(vw: number, vh: number) {
+    for (let i = 0; i < this.n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.sqrt(Math.random()) * Math.hypot(vw, vh) * 0.6;
+      this.introPos[i * 2] = vw / 2 + Math.cos(a) * d;
+      this.introPos[i * 2 + 1] = vh / 2 + Math.sin(a) * d;
+      this.introSty.set([this.grad[i * 3], this.grad[i * 3 + 1], this.grad[i * 3 + 2], 0, 1], i * 5);
+      this.disp[i * 2] = this.disp[i * 2 + 1] = 0;
+      this.vel[i * 2] = this.vel[i * 2 + 1] = 0;
+    }
+  }
+
+  /** Samples the intro name's glyphs (one "word" per character) for scene 2. */
+  private sampleName() {
+    const el = document.querySelector<HTMLElement>('[data-orb="intro-name"]');
+    if (!el) return;
+    const step = innerWidth < 760 ? 2 : 3;
+    this.nameText = sampleText(el, '.intro-char', this.n, step);
+  }
 
   private collapseTo(hero: Box, rot: Rotation) {
     for (let i = 0; i < this.n; i++) {

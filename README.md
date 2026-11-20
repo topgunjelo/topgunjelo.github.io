@@ -44,7 +44,7 @@ To add a project, add it to `projects.json`, put its screenshot in `src/assets/p
 
 ## How it behaves
 
-- **Intro.** On a plain first visit in a browser session, a point of light appears, the name and roles resolve, then the name glides into the hero heading and the point grows into the hero lens. It's skipped for deep links (`#work`, `#project-…`), Back/Forward, and later visits in the same session. **Skip intro**, Escape, or resizing the window ends it early. Reduced motion gets an opacity-only version. **Replay intro** in the footer plays it again.
+- **Intro.** On a plain first visit in a browser session, particles gather into a small orb, pour into the letters of the name (each letter sharpens as its dots land), then the name glides into the hero heading while the particles become the hero sphere. It's skipped for deep links (`#work`, `#project-…`), Back/Forward, and later visits in the same session. **Skip intro**, Escape, or resizing the window ends it early. Reduced motion gets an opacity-only version. **Replay intro** in the footer plays it again.
 - **Case studies.** Every project opens in a sheet with a shareable `#project-<slug>` URL.
 - **Quick navigation.** ⌘K / Ctrl+K (or the search button in the nav) opens a palette for sections, projects and actions.
 - **Motion.** Animations use transforms and opacity. Looping effects pause off-screen. Pointer effects run only for a mouse or trackpad. `prefers-reduced-motion` turns off movement.

@@ -120,8 +120,8 @@ export function App() {
           {phase !== 'done' && <Intro key={introKey} onHandoff={onHandoff} onDone={onDone} />}
         </AnimatePresence>
 
-        {/* The particle orb takes over from the intro's lens once the intro has landed. */}
-        {orbMode === 'particles' && phase === 'done' && <OrbLayer />}
+        {/* One particle orb for the whole visit; it also plays the intro. */}
+        {orbMode === 'particles' && <OrbLayer assemble={standalone} />}
 
         <div className="app" inert={phase !== 'done'}>
           <a className="skip-link" href="#main">
