@@ -1,0 +1,45 @@
+#root {
+  isolation: isolate;
+}
+
+main:focus {
+  outline: none;
+}
+
+/* Chapters alternate between pure white and the faintest gray to mark the turn of a page. */
+.skills,
+.journey {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-softer) 12%, var(--bg-softer) 88%, var(--bg) 100%);
+}
+
+.toast-region {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 120;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px 12px 14px;
+  border-radius: 999px;
+  background: rgba(29, 29, 31, 0.92);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.toast svg {
+  width: 18px;
+  height: 18px;
+  color: #30d158;
+}

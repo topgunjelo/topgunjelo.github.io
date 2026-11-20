@@ -1,39 +1,55 @@
 # Markie Mojica — Portfolio
 
-A single-page manga-noir portfolio for Markie Angelo S. Mojica, a frontend developer and Computer Science student specializing in Digital Forensics. The build generates static HTML and bundles GSAP, Lenis, and React Bits enhancements. All project information is available without live GitHub API requests.
+The portfolio of Markie Angelo S. Mojica, frontend developer and Computer Science student specializing in Digital Forensics at National University Manila. It's a single page built with React, TypeScript, Vite and Motion.
 
 ## Run locally
 
-Install Node.js 20 or later. Open a terminal in this directory.
+Install Node.js 22.18 or later, then:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open [http://127.0.0.1:4173](http://127.0.0.1:4173). The preview rebuilds the site when source files change. Refresh the browser to see the latest build.
+Open <http://127.0.0.1:4173>.
 
 ```sh
-npm run build
-npm run preview
+npm run check     # lint, type-check, tests and a production build
+npm run build     # type-check, then build to dist/
+npm run preview   # serve dist/
 ```
 
-The build writes one HTML document and its assets to `dist/`. Publish that directory to a static host. Section and project links use fragments within the page.
+`dist/` is a static site with relative paths, so any static host works.
 
-## Update content
+## Where things live
 
-- `src/index.html` contains the opening, profile, portrait slot, and Contact. To add a portrait, replace the `.portrait-plate` inside `.portrait-slot` with an image that has descriptive alternative text. Put the approved image under `src/assets/` and add its path to the asset list in `scripts/build.mjs`.
-- `src/expertise.html` contains the technology logos and skill disclosures. `src/profile.html` contains Experience, Education, and the Projects, Certificates, and Awards cards.
-- `src/projects.json` stores the public GitHub profile, folder contents, contribution notes, technology lists, and available public links and media. Put approved project WebP captures in `src/assets/`, describe them in the screenshot `alt` field, and run the build. Use HTTPS for public repository and demo URLs. Private folders use high-level summaries and omit private assets and links.
-- `src/styles.css` contains the layout, type, palette, and motion styles.
-- `src/opening.js` uses GSAP to reveal the name with a bat flock and holds on Click to continue. The flock disperses on activation. Escape dismisses the opening, and Replay intro is in the footer. Direct links and reduced motion go straight to the profile or linked section.
-- `src/motion.js` runs Lenis smooth wheel scrolling with GSAP ScrollTrigger. The ink smoke drifts behind the page, and chapter contents reveal behind the flock. Fragment links, touch scrolling, and keyboard scrolling use native browser behavior.
-- `src/bits.jsx` lazily loads React Bits AnimatedContent for subtle reveals over folder covers. Folders and category disclosures work in static HTML.
-- `src/bats.js` draws procedural bats and fragments with Canvas 2D. The opening uses a dedicated flock. The portfolio uses a separate layer for chapter transitions. Only one flock runs at a time. The static composition remains available when Canvas is unavailable.
+| Path | What it holds |
+| --- | --- |
+| `src/content/site.ts` | Name, headline, intro, contact details, nav sections, About copy |
+| `src/content/projects.json` | Project data: summaries, roles, technologies, links, screenshots |
+| `src/content/projects.ts` | Page order and layout of each project, the KilosUnlad flow |
+| `src/content/stack.ts` | Tech-stack logos, categories, notes, capabilities |
+| `src/content/journey.ts` | Education, experience, credentials |
+| `src/components/` | One component per chapter, plus the shared pieces (Lens, Intro, Nav, CommandPalette, CaseStudy) |
+| `src/styles/tokens.css` | Every color, size, radius, shadow and timing |
+| `src/assets/logos/` | Technology logos (Devicon, MIT — see `LICENSE-devicon.txt`) |
+| `src/assets/projects/` | Project screenshots (WebP, 1200×750) |
 
-## Artwork and type
+To add a project, add it to `projects.json`, put its screenshot in `src/assets/projects/`, and list its slug in `showcase` or `lab` in `projects.ts`. Private projects get no `repository`, `demo` or `screenshot`; the tests enforce it.
 
-The original `src/assets/ink-smoke.webp` was made with the built-in ImageGen tool. The prompt called for a wide manga-noir illustration of billowing black ink, crosshatched shadows, selective halftone, crimson smoke at the edges, and open dark space in the center. Bat silhouettes are drawn procedurally. Public project previews use screenshots and project assets. Technology marks include attribution in `src/expertise.html`.
+## How it behaves
 
-Manrope and Barlow Condensed are hosted locally with their SIL Open Font Licenses in `src/assets/`. The build includes dependency notices in `dist/assets/licenses/`.
+- **Intro.** On a plain first visit in a browser session, a point of light appears, the name and roles resolve, then the name glides into the hero heading and the point grows into the hero lens. It's skipped for deep links (`#work`, `#project-…`), Back/Forward, and later visits in the same session. **Skip intro**, Escape, or resizing the window ends it early. Reduced motion gets an opacity-only version. **Replay intro** in the footer plays it again.
+- **Case studies.** Every project opens in a sheet with a shareable `#project-<slug>` URL.
+- **Quick navigation.** ⌘K / Ctrl+K (or the search button in the nav) opens a palette for sections, projects and actions.
+- **Motion.** Animations use transforms and opacity. Looping effects pause off-screen. Pointer effects run only for a mouse or trackpad. `prefers-reduced-motion` turns off movement.
 
+`DESIGN.md` records the design rules.
+
+## Test
+
+```sh
+npm test
+```
+
+The tests cover when the intro plays and the project data rules: no excluded repositories, no links or screenshots for private projects, captioned screenshots that exist, HTTPS links, and unique slugs.

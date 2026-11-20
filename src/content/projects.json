@@ -1,0 +1,265 @@
+{
+  "github": "https://github.com/topgunjelo",
+  "projects": [
+    {
+      "slug": "angelsam-travel-tours",
+      "title": "AngelSam Travel & Tours",
+      "category": "Business website",
+      "summary": "A responsive travel website where visitors can filter 25 tour offers, view detailed package posters, and request a quotation.",
+      "technologies": [
+        "React",
+        "JavaScript",
+        "CSS",
+        "Vite",
+        "GitHub Pages"
+      ],
+      "contribution": "Redesigned the site, added guest reviews, improved the tour inquiry flow, and configured deployment to GitHub Pages.",
+      "repository": "https://github.com/angelsamtravelandtours/angelsam-travel-tours",
+      "demo": "https://angelsamtravels.com/",
+      "screenshot": {
+        "file": "project-angelsam.webp",
+        "alt": "AngelSam Travel & Tours homepage with a Philippine coastline and trip-planning buttons",
+        "caption": "Homepage screenshot"
+      },
+      "sections": [
+        {
+          "heading": "Tour discovery",
+          "body": "A data-driven React catalog groups 25 offers by tour category. Each offer has a compact cover image and a full poster that visitors can open in a keyboard-accessible dialog to compare details and rates."
+        },
+        {
+          "heading": "From package to inquiry",
+          "body": "The inquiry action carries the selected tour into the form and moves focus to the first field. The form formats travel dates, group size, and pickup details into a quotation request that visitors can send through WhatsApp or email."
+        },
+        {
+          "heading": "Deployment and updates",
+          "body": "Offer details and artwork are organized by stable IDs, so each package can be updated without editing the catalog components. GitHub Actions builds and deploys the Vite output to GitHub Pages, and the repository carries the custom-domain configuration."
+        },
+        {
+          "heading": "Private development workspace",
+          "body": "I keep a separate private angelsam-travel-tours repository for development. The published source is available in the public repository."
+        }
+      ]
+    },
+    {
+      "slug": "kilosunlad",
+      "title": "KilosUnlad",
+      "category": "Welfare auditing system",
+      "badge": "Team project",
+      "summary": "A welfare auditing system for the DSWD 4Ps program. A machine learning model and record checks flag households, a caseworker verifies them with a geotagged visit, and a director decides, with each step kept in a tamper-evident audit log.",
+      "technologies": [
+        "React",
+        "Vite",
+        "Leaflet",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "FastAPI"
+      ],
+      "contribution": "Frontend developer. Built the React app shell and interface, connected it to the authentication and backend APIs, and added dispatch, workload, audit verification, and offline field features.",
+      "repository": "https://github.com/renzv-compsci/KilosUnlad",
+      "demo": "https://kilos-unlad.vercel.app/",
+      "sections": [
+        {
+          "heading": "Review workflow",
+          "body": "Flagged households move from the model to a caseworker visit and then to a director decision. The web app works offline in the field and syncs when a connection returns."
+        },
+        {
+          "heading": "My part of the code",
+          "body": "All of my commits are in the client: the React web app, its tests, and frontend review notes. The machine learning service and API were built by teammates for a Software Engineering course at National University."
+        }
+      ]
+    },
+    {
+      "slug": "marineatlas",
+      "title": "MarineAtlas",
+      "category": "Biodiversity research platform",
+      "summary": "A platform for exploring Philippine marine species, tracking research, and recording community observations on a map.",
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Leaflet",
+        "Supabase"
+      ],
+      "contribution": "Implemented frontend features for species discovery, research and observations. Refined the observation feed, map pinning, species detail screens, and authentication flows.",
+      "repository": "https://github.com/Dustin-Martinez/MarineAtlas",
+      "screenshot": {
+        "file": "project-marine-atlas.webp",
+        "alt": "Marine Atlas landing page with a sea turtle, Philippine marine biodiversity introduction, and guest exploration button",
+        "caption": "Landing page screenshot"
+      },
+      "sections": [
+        {
+          "heading": "Species discovery",
+          "body": "Species filters, detail views, and direct links make the directory easier to browse and share. The interface surfaces species descriptions, media, and supporting facts as visitors explore."
+        },
+        {
+          "heading": "Research and observation workflows",
+          "body": "The frontend connects a research workspace with an observation feed and location pinning. Updates to the feed emphasize observation imagery and display species facts from Supabase."
+        }
+      ]
+    },
+    {
+      "slug": "stockflow-pro",
+      "title": "StockFlow Pro",
+      "category": "Inventory and order system",
+      "badge": "Team project",
+      "summary": "A MERN inventory and order system for small businesses, with admin and staff roles, products, stock movements, order fulfillment, and analytics.",
+      "technologies": [
+        "React",
+        "Vite",
+        "Tailwind CSS",
+        "Express",
+        "MongoDB",
+        "Playwright"
+      ],
+      "contribution": "Fixed stock reconciliation, session revocation, and data consistency bugs across the Express API and React state, and added API and integrity tests. A teammate wrote the original build.",
+      "repository": "https://github.com/kythegallardo12-tech/WebApp-Duo",
+      "screenshot": {
+        "file": "project-stockflow.webp",
+        "alt": "StockFlow Pro dashboard with revenue, order, product, and stock summaries",
+        "caption": "Dashboard screenshot from the repository"
+      },
+      "sections": [
+        {
+          "heading": "Integrity fixes",
+          "body": "The change covered the inventory and order services, authentication routes and middleware, and the React store and pages. New tests check that stock and orders stay consistent."
+        }
+      ]
+    },
+    {
+      "slug": "noctime",
+      "title": "NocTime",
+      "category": "Social platform prototype",
+      "visibility": "private",
+      "badge": "Private collaboration",
+      "summary": "An in-development social platform for discovering nightlife events, connecting with people, and sharing experiences after dark.",
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Express"
+      ],
+      "contribution": "Repository collaborator on a team project.",
+      "sections": [
+        {
+          "heading": "The product concept",
+          "body": "The team designed an event discovery experience alongside a social feed, profiles, messaging, and notifications. A shared navigation system connects these core views."
+        },
+        {
+          "heading": "Prototype architecture",
+          "body": "The repository separates a Next.js frontend from an Express backend, with TypeScript on both sides. Interface design is documented, with frontend implementation and mobile optimization in progress."
+        }
+      ]
+    },
+    {
+      "slug": "amanda-virtual-graduation",
+      "title": "Amanda Virtual Graduation",
+      "category": "Interactive web experience",
+      "summary": "A responsive graduation tribute that unfolds across eight slides with music, confetti, and controls for moving at the visitor’s pace.",
+      "technologies": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Web Audio API",
+        "GitHub Pages"
+      ],
+      "contribution": "Built and published the tribute, then refined the responsive ceremony layout and mobile audio playback.",
+      "repository": "https://github.com/topgunjelo/amanda-virtual-graduation",
+      "demo": "https://topgunjelo.github.io/amanda-virtual-graduation/",
+      "screenshot": {
+        "file": "project-graduation.webp",
+        "alt": "Class of 2026 slide with previous, next, and progress controls",
+        "caption": "Slide screenshot"
+      },
+      "sections": [
+        {
+          "heading": "Ceremony and navigation",
+          "body": "JavaScript manages slide state, timed advancement, and the closing confetti. Previous and next buttons, keyboard shortcuts, progress dots, and replay let visitors control the eight-slide ceremony."
+        },
+        {
+          "heading": "Playback on mobile",
+          "body": "The opening tap starts the presentation and enables audio. The site can synthesize a short instrumental with the Web Audio API if the audio file fails, and the ceremony includes a pause control."
+        }
+      ]
+    },
+    {
+      "slug": "network-guardian-ids",
+      "title": "Network Guardian IDS",
+      "category": "Cybersecurity research prototype",
+      "summary": "A team intrusion detection prototype that evaluates machine learning models on network telemetry and presents results in a security operations dashboard.",
+      "technologies": [
+        "Python",
+        "Node.js",
+        "Express",
+        "Next.js",
+        "scikit-learn",
+        "XGBoost",
+        "PyTorch TabNet"
+      ],
+      "contribution": "Implemented the backend inference bridge and input validation, added tests, and contributed to the project’s research manuscript and technical documentation.",
+      "repository": "https://github.com/Dustin-Martinez/network-guardian-ids",
+      "screenshot": {
+        "file": "project-network-guardian.webp",
+        "alt": "Bar chart comparing macro F1 scores for Random Forest, XGBoost, and TabNet on the frozen test set",
+        "caption": "Model evaluation chart"
+      },
+      "sections": [
+        {
+          "heading": "Model evaluation",
+          "body": "The team compares Random Forest, XGBoost, and TabNet on the same network telemetry task. A dashboard presents model predictions and supporting evaluation information."
+        },
+        {
+          "heading": "From API to prediction",
+          "body": "The Express server validates incoming telemetry and calls a Python bridge for inference. Backend and bridge tests cover the handoff, and the technical documentation describes how collaborators can run and extend it."
+        }
+      ]
+    },
+    {
+      "slug": "aegis-ntfs",
+      "title": "AEGIS-NTFS",
+      "category": "Digital forensics research",
+      "visibility": "private",
+      "badge": "Private research collaboration",
+      "summary": "A research proof of concept that detects NTFS metadata tampering, such as timestomping, by checking structural invariants across file system records.",
+      "technologies": [
+        "Rust",
+        "Python",
+        "LaTeX"
+      ],
+      "contribution": "Contributed the research paper sources in LaTeX, manuscript updates, and review handoff documents.",
+      "sections": [
+        {
+          "heading": "Research artifact",
+          "body": "The team built a layered Rust and Python artifact for a thesis on file system tamper detection. My merged work is in the paper and its documentation."
+        }
+      ]
+    },
+    {
+      "slug": "sponge",
+      "title": "Sponge",
+      "category": "Personal assistant prototype",
+      "visibility": "private",
+      "badge": "Private personal project",
+      "summary": "A personal assistant prototype for iPhone and Windows, with a Flutter chat interface and a Python backend.",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Python",
+        "FastAPI"
+      ],
+      "contribution": "Built the Flutter interface and FastAPI backend in a private repository.",
+      "sections": [
+        {
+          "heading": "Cross-platform application",
+          "body": "The prototype uses Flutter for the mobile and desktop interface. It explores conversations with chat history and streamed responses."
+        },
+        {
+          "heading": "Backend foundation",
+          "body": "A separate Python service built with FastAPI supports the application. The repository documents a local development setup for Windows."
+        }
+      ]
+    }
+  ]
+}

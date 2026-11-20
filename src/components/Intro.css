@@ -1,0 +1,94 @@
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #fff;
+  overflow: hidden;
+}
+
+.intro-orb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 420px;
+  height: 420px;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  will-change: transform;
+}
+
+.intro-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 0.6rem + 1.6vw, 1.75rem);
+  padding: var(--gutter);
+  text-align: center;
+  pointer-events: none;
+}
+
+.intro-anchor {
+  width: 56px;
+  height: 56px;
+  margin-bottom: clamp(0.5rem, 0.2rem + 1.2vw, 1.25rem);
+}
+
+.intro-name {
+  font-size: min(calc((100vw - 2 * var(--gutter)) / 8.8), 8rem);
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.intro-char {
+  opacity: 0;
+}
+
+.intro-roles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2em 0.45em;
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink-2);
+}
+
+.intro-role {
+  display: inline-block;
+  opacity: 0;
+}
+
+.intro-role:last-child {
+  color: var(--ink);
+}
+
+.intro-skip {
+  position: absolute;
+  right: max(var(--gutter), env(safe-area-inset-right));
+  bottom: max(var(--gutter), env(safe-area-inset-bottom));
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-2);
+  background: rgba(0, 0, 0, 0.04);
+  transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+  animation: intro-skip-in 600ms var(--ease-out) 500ms backwards;
+}
+
+.intro-skip:hover {
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.07);
+}
+
+@keyframes intro-skip-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}

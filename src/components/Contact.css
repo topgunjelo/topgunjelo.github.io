@@ -1,0 +1,222 @@
+.contact {
+  padding-bottom: clamp(5rem, 4rem + 5vw, 8rem);
+  overflow: hidden;
+}
+
+.contact-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.contact-lens {
+  width: clamp(7rem, 5rem + 8vw, 11rem);
+  margin-bottom: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+}
+
+.contact-title {
+  display: grid;
+  margin-top: 20px;
+  font-size: var(--text-4xl);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.contact-title .spectrum-text {
+  padding-bottom: 0.08em;
+}
+
+.contact-lede {
+  margin-top: 22px;
+  max-width: 32rem;
+  font-size: var(--text-lg);
+  color: var(--ink-2);
+}
+
+.contact-email-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+}
+
+.contact-email {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+  font-size: clamp(1.375rem, 0.9rem + 2.4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+.contact-email::before,
+.contact-email::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.contact-email::before {
+  background: var(--silver);
+}
+
+.contact-email::after {
+  background: var(--spectrum);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 700ms var(--ease-out);
+}
+
+.contact-email:hover::after,
+.contact-email:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.contact-email-text {
+  transition: color 400ms var(--ease-out);
+}
+
+.contact-email:hover .contact-email-text {
+  color: var(--blue-ink);
+}
+
+.contact-email svg {
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
+  color: var(--ink-3);
+  transition: transform 500ms var(--ease-out), color 400ms var(--ease-out);
+}
+
+.contact-email:hover svg {
+  transform: translate(3px, -3px);
+  color: var(--blue-ink);
+}
+
+.contact-copy {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  transition: background-color var(--dur-2) var(--ease-out);
+}
+
+.contact-copy:hover {
+  background: #e8e8ed;
+}
+
+.contact-copy[data-copied='true'] {
+  background: rgba(48, 209, 88, 0.14);
+  color: #1a8f3c;
+}
+
+.contact-copy:active {
+  transform: scale(0.92);
+}
+
+.contact-copy svg {
+  width: 20px;
+  height: 20px;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.contact-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  font-size: var(--text-base);
+  color: var(--ink-2);
+}
+
+.contact-location svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  padding: 28px 0 calc(28px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px 24px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 4px;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+
+.footer-link:hover {
+  color: var(--ink);
+  background: var(--bg-soft);
+}
+
+.footer-link svg {
+  width: 14px;
+  height: 14px;
+}
+
+.footer-note {
+  grid-column: 1 / -1;
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+
+.footer-note a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .footer-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .footer-links {
+    margin-left: -12px;
+  }
+}
