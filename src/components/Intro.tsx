@@ -5,7 +5,7 @@ import { useScrollLock } from '../lib/hooks';
 import { useOrbMode } from '../orb/OrbLayer';
 import { orbStore } from '../orb/store';
 import { Lens } from './Lens';
-import { NameGlyphs } from './Name';
+import { flipOnto, NameGlyphs } from './Name';
 import './Intro.css';
 
 type Props = {
@@ -15,7 +15,9 @@ type Props = {
   onDone: () => void;
 };
 
-const glide = [0.76, 0, 0.24, 1] as const;
+/** The name's glide into the hero: a long, even ease so it never lurches. */
+const glide = [0.65, 0, 0.25, 1] as const;
+const GLIDE = 1.35;
 const settle = [0.22, 1, 0.36, 1] as const;
 const DOT = 56;
 
@@ -46,6 +48,12 @@ export function Intro({ onHandoff, onDone }: Props) {
       orbStore.setIntroStage(null);
       onHandoff();
       onDone();
+    };
+
+    // A leftover `filter: blur(0px)` puts each letter on its own layer, which renders text
+    // slightly differently from the hero heading; clear it so the two copies match exactly.
+    const clearCharFilters = () => {
+      scope.current?.querySelectorAll<HTMLElement>('.intro-char').forEach(char => (char.style.filter = ''));
     };
 
     const skip = () => {
@@ -105,7 +113,7 @@ export function Intro({ onHandoff, onDone }: Props) {
         '.intro-char',
         { opacity: [0, 1], y: ['0.35em', '0em'], filter: ['blur(14px)', 'blur(0px)'] },
         { duration: 0.95, ease: settle, delay: stagger(0.038) },
-      );
+      ).then(clearCharFilters);
       await wait(700);
       if (cancelled) return;
       await animate(
@@ -119,27 +127,16 @@ export function Intro({ onHandoff, onDone }: Props) {
       // Scene 3 — the handoff
       onHandoff();
       const name = nameRef.current!;
-      const from = name.getBoundingClientRect();
-      const to = heroName.getBoundingClientRect();
       const lens = heroLens.getBoundingClientRect();
-      const scale = to.width / from.width;
 
       await Promise.all([
-        animate(scope.current, { backgroundColor: 'rgba(255,255,255,0)' }, { duration: 0.7, ease: 'easeOut' }),
-        animate('.intro-roles', { opacity: 0, y: -8 }, { duration: 0.35, ease: 'easeIn' }),
+        animate(scope.current, { backgroundColor: 'rgba(255,255,255,0)' }, { duration: 0.8, ease: 'easeOut' }),
+        animate('.intro-roles', { opacity: 0, y: -8, filter: 'blur(6px)' }, { duration: 0.45, ease: 'easeIn' }),
         animate('.intro-skip', { opacity: 0 }, { duration: 0.25 }),
-        animate(
-          name,
-          {
-            x: to.left + to.width / 2 - (from.left + from.width / 2),
-            y: to.top + to.height / 2 - (from.top + from.height / 2),
-            scale,
-          },
-          { duration: 1.15, ease: glide },
-        ),
-        animate(orb, { x: lens.left, y: lens.top, scale: 1 }, { duration: 1.25, ease: glide, delay: 0.06 }),
+        animate(name, flipOnto(name, heroName), { duration: GLIDE, ease: glide }),
+        animate(orb, { x: lens.left, y: lens.top, scale: 1 }, { duration: GLIDE + 0.1, ease: glide, delay: 0.06 }),
       ]);
-      if (!cancelled) finish();
+      if (!cancelled) land();
     }
 
     /**
@@ -159,7 +156,7 @@ export function Intro({ onHandoff, onDone }: Props) {
         '.intro-char',
         { opacity: [0, 1], filter: ['blur(12px)', 'blur(0px)'] },
         { duration: 0.8, ease: settle, delay: stagger(0.045, { startDelay: 0.4 }) },
-      );
+      ).then(clearCharFilters);
       await wait(1500);
       if (cancelled) return;
       await animate(
@@ -174,24 +171,27 @@ export function Intro({ onHandoff, onDone }: Props) {
       onHandoff();
       orbStore.setIntroStage('hero');
       const name = nameRef.current!;
-      const from = name.getBoundingClientRect();
-      const to = heroName.getBoundingClientRect();
       await Promise.all([
-        animate(scope.current, { backgroundColor: 'rgba(255,255,255,0)' }, { duration: 0.7, ease: 'easeOut' }),
-        animate('.intro-roles', { opacity: 0, y: -8 }, { duration: 0.35, ease: 'easeIn' }),
+        animate(scope.current, { backgroundColor: 'rgba(255,255,255,0)' }, { duration: 0.8, ease: 'easeOut' }),
+        animate('.intro-roles', { opacity: 0, y: -8, filter: 'blur(6px)' }, { duration: 0.45, ease: 'easeIn' }),
         animate('.intro-skip', { opacity: 0 }, { duration: 0.25 }),
-        animate(
-          name,
-          {
-            x: to.left + to.width / 2 - (from.left + from.width / 2),
-            y: to.top + to.height / 2 - (from.top + from.height / 2),
-            scale: to.width / from.width,
-          },
-          { duration: 1.15, ease: glide },
-        ),
-        wait(1300),
+        animate(name, flipOnto(name, heroName), { duration: GLIDE, ease: glide }),
+        wait(GLIDE * 1000 + 120),
       ]);
-      if (!cancelled) finish();
+      if (!cancelled) land();
+    }
+
+    /**
+     * The copy now sits exactly on the hero heading. Reveal the real heading, then drop the copy
+     * a couple of frames later, so there's never a frame with two names or with none.
+     */
+    function land() {
+      finish();
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          if (nameRef.current) nameRef.current.style.opacity = '0';
+        }),
+      );
     }
 
     play();

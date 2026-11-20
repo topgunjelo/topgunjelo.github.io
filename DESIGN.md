@@ -23,7 +23,7 @@ All values live in `src/styles/tokens.css`. Use the tokens; don't add raw hex va
 
 - Use transforms and opacity only. Springs have no bounce unless a gesture carried momentum.
 - Scroll-linked values go through `useRange` (`src/lib/hooks.ts`), not plain range `useTransform`. Motion otherwise hands them to the browser's native ViewTimeline, which froze after the intro's scroll lock.
-- The intro's name and the hero name share `.name-type` and per-glyph spans (`NameGlyphs`), so the intro copy lands on the hero copy exactly. Keep them identical.
+- The intro's name and the hero name share `.name-type` and per-glyph spans (`NameGlyphs`), so the intro copy lands on the hero copy exactly. Keep them identical. The glide aims at the letters (`glyphBox`/`flipOnto` in `Name.tsx`), never at the element box: the hero heading is a full-width block, and aiming at its box made the name land oversized and off-center, then jump.
 - Looping CSS animations sit under `usePauseOffscreen` so they stop when out of view.
 - Pointer effects (tilt, parallax, magnetic buttons) only run with a fine pointer and without reduced motion. Hover is never the only way to reach information.
 

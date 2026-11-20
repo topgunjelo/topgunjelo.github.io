@@ -323,7 +323,8 @@ export class OrbEngine {
     // While the intro plays, the particles draw above its white stage.
     this.canvas.style.zIndex = stage ? '101' : '';
     const introOrb = stage === 'gather' ? this.box('intro-orb') : null;
-    const nameBox = stage === 'name' ? this.box('intro-name') : null;
+    // The name's box is read live, transform included, so dots can ride along as it glides.
+    const nameBox = stage === 'name' || stage === 'hero' ? this.box('intro-name') : null;
     const introRot = rotation(t * 0.5, -0.3);
     const nameText = this.nameText;
     const nameScale = nameBox && nameText ? nameBox.w / nameText.width : 1;
@@ -514,9 +515,25 @@ export class OrbEngine {
             delay = 0;
           }
         }
+        // Scene 3: each dot first rides along with its letter as the name glides, then peels off
+        // toward the hero sphere, spread across the glide so the name sheds them gradually.
+        let riding = false;
+        if (stage === 'hero' && nameBox && nameText) {
+          delay = 0.1 + jitter * 0.9;
+          if (this.introT < delay) {
+            riding = true;
+            tx = nameBox.x + nameText.points[ip] * nameScale;
+            ty = nameBox.y + nameText.points[ip + 1] * nameScale;
+            tr = this.introSty[is];
+            tg = this.introSty[is + 1];
+            tb = this.introSty[is + 2];
+            ta = 0.1; // faint while riding, so they never read as a second copy of the name
+            ts = this.introSty[is + 4];
+          }
+        }
         // Scene 1 converges faster so the small orb settles into a crisp sphere before it pours.
         const rate = this.seed[s4 + 2] * (stage === 'gather' ? 1.9 : 1.1);
-        const k = this.introT >= delay ? 1 - Math.exp(-dt * rate) : 0;
+        const k = riding ? 1 - Math.exp(-dt * 45) : this.introT >= delay ? 1 - Math.exp(-dt * rate) : 0;
         this.introPos[ip] += (tx - this.introPos[ip]) * k;
         this.introPos[ip + 1] += (ty - this.introPos[ip + 1]) * k;
         this.introSty[is] += (tr - this.introSty[is]) * k;
